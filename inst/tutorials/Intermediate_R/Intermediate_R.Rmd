@@ -14,7 +14,7 @@ library(learnr)
 library(gradethis)
 library(digest)
 learnr::tutorial_options(
-  exercise.timelimit = 30,
+  exercise.timelimit = 15,
   exercise.checker = grade_learnr,
   exercise.eval = FALSE
 )
@@ -606,7 +606,7 @@ colnames(li_df) <- c("day1", "day2", "day3", "day4", "day5", "day6", "day7")
 li_df <- data.frame(li_df)
 ```
 
-```{r blend-ex-0, exercise=TRUE}
+```{r blend-ex-0, exercise=TRUE, exercise.setup="blend-setup"}
 
 ```
 
@@ -631,6 +631,75 @@ grade_result(
 *Use* `second` *to create a logical vector, that contains* `TRUE` *if the corresponding number of views is strictly greater than 25 or strictly lower than 5 and* `FALSE` *otherwise. Store this logical vector as* `extremes`*.*
 
 ```{r blend-ex-2-setup, echo=FALSE}
+# Constructing the li_df data frame
+employee_1 <- c(2, 3, 3, 6, 4, 2, 0)
+employee_2 <- c(19, 23, 18, 22, 23, 29, 25)
+employee_3 <- c(24, 18, 15, 19, 18, 22, 17)
+employee_4 <- c(22, 18, 27, 26, 19, 21, 25)
+employee_5 <- c(25, 25, 26, 31, 24, 36, 37)
+employee_6 <- c(22, 20, 29, 26, 23, 22, 29)
+employee_7 <- c(0, 4, 2, 2, 3, 4, 2)
+employee_8 <- c(12, 3, 15, 7, 1, 15, 11)
+employee_9 <- c(19, 22, 22, 19, 25, 24, 23)
+employee_10 <- c(23, 12, 19, 25, 18, 22, 22)
+employee_11 <- c(29, 27, 23, 25, 29, 30, 17)
+employee_12 <- c(13, 13, 20, 17, 12, 22, 20)
+employee_13 <- c(7, 17, 9, 5, 11, 9, 9)
+employee_14 <- c(26, 27, 28, 36, 29, 31, 30)
+employee_15 <- c(7, 6, 4, 11, 5, 5, 15)
+employee_16 <- c(32, 35, 31, 35, 24, 25, 36)
+employee_17 <- c(7, 17, 9, 12, 13, 6, 12)
+employee_18 <- c(9, 6, 3, 12, 3, 8, 6)
+employee_19 <- c(0, 1, 11, 6, 0, 4, 11)
+employee_20 <- c(9, 12, 6, 13, 12, 13, 11)
+employee_21 <- c(6, 15, 15, 10, 9, 7, 18)
+employee_22 <- c(17, 17, 12, 4, 14, 17, 7)
+employee_23 <- c(1, 12, 8, 2, 4, 4, 11)
+employee_24 <- c(5, 8, 0, 1, 6, 3, 1)
+employee_25 <- c(2, 7, 5, 3, 1, 5, 5)
+employee_26 <- c(29, 25, 32, 28, 28, 27, 27)
+employee_27 <- c(17, 15, 17, 23, 23, 17, 22)
+employee_28 <- c(26, 32, 33, 30, 33, 28, 26)
+employee_29 <- c(27, 29, 24, 29, 26, 31, 28)
+employee_30 <- c(4, 1, 1, 2, 1, 7, 4)
+employee_31 <- c(22, 22, 17, 20, 14, 19, 13)
+employee_32 <- c(9, 11, 7, 10, 8, 15, 5)
+employee_33 <- c(6, 5, 12, 5, 17, 17, 4)
+employee_34 <- c(18, 17, 12, 22, 22, 13, 12)
+employee_35 <- c(2, 12, 13, 7, 10, 6, 2)
+employee_36 <- c(32, 26, 20, 23, 24, 25, 21)
+employee_37 <- c(5, 13, 12, 11, 6, 5, 10)
+employee_38 <- c(6, 10, 11, 6, 6, 2, 5)
+employee_39 <- c(30, 37, 32, 35, 37, 41, 42)
+employee_40 <- c(34, 33, 32, 35, 33, 27, 35)
+employee_41 <- c(15, 19, 21, 18, 22, 26, 22)
+employee_42 <- c(28, 29, 30, 19, 21, 19, 26)
+employee_43 <- c(6, 8, 6, 7, 17, 11, 14)
+employee_44 <- c(17, 22, 27, 24, 18, 28, 24)
+employee_45 <- c(6, 10, 17, 18, 13, 10, 7)
+employee_46 <- c(18, 19, 22, 17, 21, 15, 23)
+employee_47 <- c(21, 27, 28, 28, 26, 17, 25)
+employee_48 <- c(10, 18, 20, 18, 12, 19, 17)
+employee_49 <- c(6, 15, 15, 15, 10, 14, 2)
+employee_50 <- c(30, 28, 29, 31, 24, 20, 25)
+
+li_df <- c(employee_1, employee_2, employee_3, employee_4, employee_5, 
+           employee_6, employee_7, employee_8, employee_9, employee_10, 
+           employee_11, employee_12, employee_13, employee_14, employee_15, 
+           employee_16, employee_17, employee_18, employee_19, employee_20, 
+           employee_21, employee_22, employee_23, employee_24, employee_25, 
+           employee_26, employee_27, employee_28, employee_29, employee_30, 
+           employee_31, employee_32, employee_33, employee_34, employee_35, 
+           employee_36, employee_37, employee_38, employee_39, employee_40, 
+           employee_41, employee_42, employee_43, employee_44, employee_45, 
+           employee_46, employee_47, employee_48, employee_49, employee_50)
+
+li_df <- matrix(li_df, nrow = 50, byrow = TRUE)
+
+colnames(li_df) <- c("day1", "day2", "day3", "day4", "day5", "day6", "day7")
+
+li_df <- data.frame(li_df)
+
 second <- li_df[, 2]
 ```
 
@@ -652,7 +721,77 @@ grade_result(
 *Use* `sum()` *on the* `extremes` *vector to calculate the number of* `TRUE`*s in extremes (i.e. to calculate the number of employees that are either very popular or very low-profile). Simply print this number to the console.*
 
 ```{r blend-ex-3-setup, echo=FALSE}
+# Constructing the li_df data frame
+employee_1 <- c(2, 3, 3, 6, 4, 2, 0)
+employee_2 <- c(19, 23, 18, 22, 23, 29, 25)
+employee_3 <- c(24, 18, 15, 19, 18, 22, 17)
+employee_4 <- c(22, 18, 27, 26, 19, 21, 25)
+employee_5 <- c(25, 25, 26, 31, 24, 36, 37)
+employee_6 <- c(22, 20, 29, 26, 23, 22, 29)
+employee_7 <- c(0, 4, 2, 2, 3, 4, 2)
+employee_8 <- c(12, 3, 15, 7, 1, 15, 11)
+employee_9 <- c(19, 22, 22, 19, 25, 24, 23)
+employee_10 <- c(23, 12, 19, 25, 18, 22, 22)
+employee_11 <- c(29, 27, 23, 25, 29, 30, 17)
+employee_12 <- c(13, 13, 20, 17, 12, 22, 20)
+employee_13 <- c(7, 17, 9, 5, 11, 9, 9)
+employee_14 <- c(26, 27, 28, 36, 29, 31, 30)
+employee_15 <- c(7, 6, 4, 11, 5, 5, 15)
+employee_16 <- c(32, 35, 31, 35, 24, 25, 36)
+employee_17 <- c(7, 17, 9, 12, 13, 6, 12)
+employee_18 <- c(9, 6, 3, 12, 3, 8, 6)
+employee_19 <- c(0, 1, 11, 6, 0, 4, 11)
+employee_20 <- c(9, 12, 6, 13, 12, 13, 11)
+employee_21 <- c(6, 15, 15, 10, 9, 7, 18)
+employee_22 <- c(17, 17, 12, 4, 14, 17, 7)
+employee_23 <- c(1, 12, 8, 2, 4, 4, 11)
+employee_24 <- c(5, 8, 0, 1, 6, 3, 1)
+employee_25 <- c(2, 7, 5, 3, 1, 5, 5)
+employee_26 <- c(29, 25, 32, 28, 28, 27, 27)
+employee_27 <- c(17, 15, 17, 23, 23, 17, 22)
+employee_28 <- c(26, 32, 33, 30, 33, 28, 26)
+employee_29 <- c(27, 29, 24, 29, 26, 31, 28)
+employee_30 <- c(4, 1, 1, 2, 1, 7, 4)
+employee_31 <- c(22, 22, 17, 20, 14, 19, 13)
+employee_32 <- c(9, 11, 7, 10, 8, 15, 5)
+employee_33 <- c(6, 5, 12, 5, 17, 17, 4)
+employee_34 <- c(18, 17, 12, 22, 22, 13, 12)
+employee_35 <- c(2, 12, 13, 7, 10, 6, 2)
+employee_36 <- c(32, 26, 20, 23, 24, 25, 21)
+employee_37 <- c(5, 13, 12, 11, 6, 5, 10)
+employee_38 <- c(6, 10, 11, 6, 6, 2, 5)
+employee_39 <- c(30, 37, 32, 35, 37, 41, 42)
+employee_40 <- c(34, 33, 32, 35, 33, 27, 35)
+employee_41 <- c(15, 19, 21, 18, 22, 26, 22)
+employee_42 <- c(28, 29, 30, 19, 21, 19, 26)
+employee_43 <- c(6, 8, 6, 7, 17, 11, 14)
+employee_44 <- c(17, 22, 27, 24, 18, 28, 24)
+employee_45 <- c(6, 10, 17, 18, 13, 10, 7)
+employee_46 <- c(18, 19, 22, 17, 21, 15, 23)
+employee_47 <- c(21, 27, 28, 28, 26, 17, 25)
+employee_48 <- c(10, 18, 20, 18, 12, 19, 17)
+employee_49 <- c(6, 15, 15, 15, 10, 14, 2)
+employee_50 <- c(30, 28, 29, 31, 24, 20, 25)
+
+li_df <- c(employee_1, employee_2, employee_3, employee_4, employee_5, 
+           employee_6, employee_7, employee_8, employee_9, employee_10, 
+           employee_11, employee_12, employee_13, employee_14, employee_15, 
+           employee_16, employee_17, employee_18, employee_19, employee_20, 
+           employee_21, employee_22, employee_23, employee_24, employee_25, 
+           employee_26, employee_27, employee_28, employee_29, employee_30, 
+           employee_31, employee_32, employee_33, employee_34, employee_35, 
+           employee_36, employee_37, employee_38, employee_39, employee_40, 
+           employee_41, employee_42, employee_43, employee_44, employee_45, 
+           employee_46, employee_47, employee_48, employee_49, employee_50)
+
+li_df <- matrix(li_df, nrow = 50, byrow = TRUE)
+
+colnames(li_df) <- c("day1", "day2", "day3", "day4", "day5", "day6", "day7")
+
+li_df <- data.frame(li_df)
+
 second <- li_df[, 2]
+
 extremes <- second > 25 | second < 5
 ```
 
