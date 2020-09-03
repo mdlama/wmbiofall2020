@@ -13,7 +13,10 @@ description: "Intermediate R is the next stop on your journey in mastering the R
 library(learnr)
 library(gradethis)
 library(digest)
-gradethis_setup()
+learnr::tutorial_options(
+  exercise.timelimit = 15,
+  exercise.checker = grade_learnr
+)
 ```
 
 # Intermediate R
