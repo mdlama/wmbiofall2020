@@ -13,7 +13,7 @@ Imports:
     digest,
     gradethis
 Remotes:
-    rstudio-education/gradethis
+    rstudio-education/gradethis@6baf2d9
 License: MIT
 Encoding: UTF-8
 LazyData: true
