@@ -10,7 +10,8 @@ Depends:
 Imports:
     shiny,
     learnr,
-    digest
+    digest,
+    gradethis
 Remotes:
     rstudio-education/gradethis
 License: MIT
