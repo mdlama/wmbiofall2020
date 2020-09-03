@@ -15,7 +15,8 @@ library(gradethis)
 library(digest)
 learnr::tutorial_options(
   exercise.timelimit = 30,
-  exercise.checker = grade_learnr
+  exercise.checker = grade_learnr,
+  exercise.eval = FALSE
 )
 ```
 
