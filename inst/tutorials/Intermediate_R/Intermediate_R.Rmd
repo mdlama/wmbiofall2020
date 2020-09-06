@@ -9,13 +9,16 @@ runtime: shiny_prerendered
 description: "Intermediate R is the next stop on your journey in mastering the R programming language. In this R training, you will learn about conditional statements, loops, and functions to power your own R scripts. Next, make your R code more efficient and readable using the apply functions. Finally, the utilities chapter gets you up to speed with regular expressions in R, data structure manipulations, and times and dates. This course will allow you to take the next step in advancing your overall knowledge and capabilities while programming in R."
 ---
 
-```{r setup, include=FALSE}
+```{r libraries, include=FALSE}
 library(learnr)
 library(gradethis)
 library(digest)
+```
+
+```{r setup, include=FALSE}
 learnr::tutorial_options(
   exercise.timelimit = 15,
-  exercise.checker = grade_learnr,
+  exercise.checker = gradethis::grade_learnr,
   exercise.eval = FALSE
 )
 ```
@@ -24,7 +27,7 @@ learnr::tutorial_options(
 
 Intermediate R is the next stop on your journey in mastering the R programming language. In this R training, you will learn about conditional statements, loops, and functions to power your own R scripts. Next, make your R code more efficient and readable using the apply functions. This course will allow you to take the next step in advancing your overall knowledge and capabilities while programming in R.
 
-## Chap. 1: Conditionals and control flow {data-progressive=TRUE}
+## Chap. 1: Conditionals and control flow
 
 To be TRUE or not be TRUE, that's the question. In this chapter you'll learn about relational operators to see how R objects compare and logical operators to combine logicals. Next, you'll use this knowledge to build conditional statements.
 
@@ -90,7 +93,7 @@ TRUE == FALSE
 ```
 
 ```{r truthiness-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Comparison of numerics
@@ -105,7 +108,7 @@ grade_code()
 ```
 
 ```{r truthiness-ex-2-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 3: Comparison of character strings
@@ -120,7 +123,7 @@ grade_code()
 ```
 
 ```{r truthiness-ex-3-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 4: Compare a logical with a numeric
@@ -135,7 +138,7 @@ TRUE == 1
 ```
 
 ```{r truthiness-ex-4-check}
-grade_code("Since `TRUE` coerces to `1` under the hood, `TRUE == 1` evaluates to `TRUE`. Make sure not to mix up `==` (comparison) and `=` (assignment), `==` is needed to check the equality of R objects.")
+gradethis::grade_code("Since `TRUE` coerces to `1` under the hood, `TRUE == 1` evaluates to `TRUE`. Make sure not to mix up `==` (comparison) and `=` (assignment), `==` is needed to check the equality of R objects.")
 ```
 
 ### Greater and less than
@@ -180,7 +183,7 @@ TRUE <= FALSE
 ```
 
 ```{r grtorequ-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Comparison of character strings
@@ -195,7 +198,7 @@ grade_code()
 ```
 
 ```{r grtorequ-ex-2-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 3: Comparison of logicals
@@ -210,7 +213,7 @@ TRUE > FALSE
 ```
 
 ```{r grtorequ-ex-3-check}
-grade_code("Make sure to have a look at the console output to see if R returns the results you expected.")
+gradethis::grade_code("Make sure to have a look at the console output to see if R returns the results you expected.")
 ```
 
 ### Compare vectors
@@ -254,7 +257,7 @@ linkedin > 15
 ```
 
 ```{r compare-vecs-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Quiet days 
@@ -269,7 +272,7 @@ linkedin <= 5
 ```
 
 ```{r compare-vecs-ex-2-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 3: LinkedIn more popular than Facebook
@@ -284,7 +287,7 @@ linkedin > facebook
 ```
 
 ```{r compare-vecs-ex-3-check}
-grade_code("Have a look at the console output. Your LinkedIn profile was pretty popular on the sixth day, but less so on the fourth and fifth day.")
+gradethis::grade_code("Have a look at the console output. Your LinkedIn profile was pretty popular on the sixth day, but less so on the fourth and fifth day.")
 ```
 
 ### Compare matrices
@@ -313,7 +316,7 @@ views == 13
 ```
 
 ```{r compare-mats-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: When is views less than or equal to 14?
@@ -328,7 +331,7 @@ views <= 14
 ```
 
 ```{r compare-mats-ex-2-check}
-grade_code("This exercise concludes the part on comparators. Now that you know how to query the relation between R objects, the next step will be to use the results to alter the behavior of your programs. Find out all about that in the next video!")
+gradethis::grade_code("This exercise concludes the part on comparators. Now that you know how to query the relation between R objects, the next step will be to use the results to alter the behavior of your programs. Find out all about that in the next video!")
 ```
 
 ### Logical Operators: AND (`&`), OR (`|`) and NOT (`!`)
@@ -424,7 +427,7 @@ last < 5 | last > 10
 ```
 
 ```{r and-or-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Is last between 15 (exclusive) and 20 (inclusive)?
@@ -439,7 +442,7 @@ last > 15 & last <= 20
 ```
 
 ```{r and-or-ex-2-check}
-grade_code("Have one last look at the console before proceeding; do the results of the different expressions make sense?")
+gradethis::grade_code("Have one last look at the console before proceeding; do the results of the different expressions make sense?")
 ```
 
 ### Logical Operators: Vectorized!
@@ -473,7 +476,7 @@ linkedin > 10 & facebook < 10
 ```
 
 ```{r and-or-vec-mat-ex-1-check}
-grade_code("You'll have noticed how easy it is to use logical operators to vectors and matrices. What do these results tell us? The third day of the recordings was the only day where your LinkedIn profile was visited more than 10 times, while your Facebook profile wasn't. Can you draw similar conclusions for the results of the next two exercises?")
+gradethis::grade_code("You'll have noticed how easy it is to use logical operators to vectors and matrices. What do these results tell us? The third day of the recordings was the only day where your LinkedIn profile was visited more than 10 times, while your Facebook profile wasn't. Can you draw similar conclusions for the results of the next two exercises?")
 ```
 
 #### Exercise 2: When were one or both visited at least 12 times?
@@ -488,7 +491,7 @@ linkedin >= 12 | facebook >= 12
 ```
 
 ```{r and-or-vec-mat-ex-2-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 3: When is views between 11 (exclusive) and 14 (inclusive)?
@@ -503,7 +506,7 @@ views > 11 & views <= 14
 ```
 
 ```{r and-or-vec-mat-ex-3-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 ### Reverse the result: !
@@ -821,7 +824,7 @@ sum(li_df[, 2] > 25 | li_df[, 2] < 5)
 ```
 
 ```{r blend-ex-4-check}
-grade_code("This one liner illustrates that you may or may not need to store the second column as an intermediate variable if you only need to use it once. Head over to the next section and learn how relational and logical operators can be used to alter the flow of your R scripts.")
+gradethis::grade_code("This one liner illustrates that you may or may not need to store the second column as an intermediate variable if you only need to use it once. Head over to the next section and learn how relational and logical operators can be used to alter the flow of your R scripts.")
 ```
 
 ### Conditional statements: The if statement
@@ -871,7 +874,7 @@ if (num_views > 15) {
 ```
 
 ```{r if-ex-2-check}
-grade_code("Try to see what happens if you change the `medium` and `num_views` variables and run your code again. Let's further customize these if statements in the next exercise.")
+gradethis::grade_code("Try to see what happens if you change the `medium` and `num_views` variables and run your code again. Let's further customize these if statements in the next exercise.")
 ```
 
 ### Add an else
@@ -930,7 +933,7 @@ if (medium == "LinkedIn") {
 ```
 
 ```{r else-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Control structure for num_views
@@ -951,7 +954,7 @@ if (num_views > 15) {
 ```
 
 ```{r else-ex-2-check}
-grade_code("You also had Facebook information available, remember? Time to add some more statements to our control structures using `else if`!")
+gradethis::grade_code("You also had Facebook information available, remember? Time to add some more statements to our control structures using `else if`!")
 ```
 
 ### Customize further: else if
@@ -1043,7 +1046,7 @@ if (medium == "LinkedIn") {
 ```
 
 ```{r else-if-ex-1-check}
-grade_code()
+gradethis::grade_code()
 ```
 
 #### Exercise 2: Control structure for num_views
@@ -1068,7 +1071,7 @@ if (num_views > 15) {
 ```
 
 ```{r else-if-ex-2-check}
-grade_code("Because R abandons the control flow as soon as it finds a condition that is met, you can simplify the condition for the `else if` part in the second construct to `num_views > 10`.")
+gradethis::grade_code("Because R abandons the control flow as soon as it finds a condition that is met, you can simplify the condition for the `else if` part in the second construct to `num_views > 10`.")
 ```
 
 ### Else if 2.0
@@ -1138,12 +1141,12 @@ sms
 ```
 
 ```{r control-ex-1-check}
-grade_code("Feel free to play around some more with your solution by changing the values of `li` and `fb`.")
+gradethis::grade_code("Feel free to play around some more with your solution by changing the values of `li` and `fb`.")
 ```
 
 **You have finished the chapter "Conditionals and control flow"!**
 
-## Chap. 2: Loops {data-progressive=TRUE}
+## Chap. 2: Loops
 
 Loops can come in handy on numerous occasions. `while` loops are like repeated if statements; the `for` loop is designed to iterate over all elements in a sequence. Learn all about them in this chapter.
 
@@ -1191,8 +1194,8 @@ Time for some exercises!
 speed <- 64
 
 # Code the while loop
-while (___) {
-  ___
+while (condition) {
+  
 }
 
 # Print out the speed variable
@@ -1214,7 +1217,7 @@ speed
 ```
 
 ```{r loop-ex-check}
-grade_code("Proceed to the next exercise.")
+gradethis::grade_code("Proceed to the next exercise.")
 ```
 
 ### Throw in more conditionals
@@ -1260,7 +1263,7 @@ while (speed > 30) {
 ```
 
 ```{r more-ex-check}
-grade_code("To further improve our driver assistant model, head over to the next exercise!")
+gradethis::grade_code("To further improve our driver assistant model, head over to the next exercise!")
 ```
 
 ### Stop the while loop with break
@@ -1293,7 +1296,6 @@ while (speed > 30) {
   print(paste("Your speed is", speed))
 
   # Break the while loop when speed exceeds 80
-  ___
 
   if (speed > 48) {
     print("Slow down big time!")
@@ -1328,7 +1330,7 @@ while (speed > 30) {
 ```
 
 ```{r break-ex-check}
-grade_code("Now that you've correctly solved this exercise, feel free to play around with different values of `speed` to see how the `while` loop handles the different cases.")
+gradethis::grade_code("Now that you've correctly solved this exercise, feel free to play around with different values of `speed` to see how the `while` loop handles the different cases.")
 ```
 
 ### Build a while loop from scratch
@@ -1347,7 +1349,7 @@ i <- 1
 
 # Code the while loop
 while (i <= 10) {
-  ___
+  
   i <- i + 1
 }
 ```
@@ -1516,7 +1518,7 @@ for (i in 1:length(linkedin)) {
 ```
 
 ```{r vector-loop-ex-check}
-grade_code("Please go to the next exercise.")
+gradethis::grade_code("Please go to the next exercise.")
 ```
 
 ### Loop over a list
@@ -1577,7 +1579,7 @@ for (i in 1:length(nyc)) {
 ```
 
 ```{r list-loop-ex-check}
-grade_code("We mentioned that `for` loops can also be used for matrices. Let's put that to a test in the next exercise.")
+gradethis::grade_code("We mentioned that `for` loops can also be used for matrices. Let's put that to a test in the next exercise.")
 ```
 
 ### Loop over a matrix
@@ -1625,7 +1627,7 @@ for (i in 1:nrow(ttt)) {
 ```
 
 ```{r matrix-loop-ex-check}
-grade_code("You're sufficiently comfortable with basic `for` looping, so it's time to step it up a notch!")
+gradethis::grade_code("You're sufficiently comfortable with basic `for` looping, so it's time to step it up a notch!")
 ```
 
 ### Mix it up with control flow
@@ -1644,7 +1646,7 @@ linkedin <- c(16, 9, 13, 5, 2, 17, 14)
 
 # Code the for loop with conditionals
 for (li in linkedin) {
-  ___
+  
   print(li)
 }
 ```
@@ -1665,7 +1667,7 @@ for (li in linkedin) {
 ```
 
 ```{r flow-loop-check}
-grade_code("In the next exercise, you'll customize this `for` loop even further with `break` and `next` statements.")
+gradethis::grade_code("In the next exercise, you'll customize this `for` loop even further with `break` and `next` statements.")
 ```
 
 ### Next, you break it
@@ -1695,10 +1697,8 @@ for (li in linkedin) {
     print("Be more visible!")
   }
   # Add if statement with break
-  ___
   
   # Add if statement with next
-  ___
   
   print(li)
 }
@@ -1730,7 +1730,7 @@ for (li in linkedin) {
 ```
 
 ```{r break-for-ex-check}
-grade_code("`for`, `break`, `next`? We name it, you can do it!")
+gradethis::grade_code("`for`, `break`, `next`? We name it, you can do it!")
 ```
 
 ### Build a for loop from scratch
@@ -1754,15 +1754,14 @@ rquote <- "r's internals are irrefutably intriguing"
 chars <- strsplit(rquote, split = "")[[1]]
 
 # Initialize rcount
-___
 
 # Finish the for loop
 for (char in chars) {
-  ___
+  
 }
 
 # Print out rcount
-___
+
 ```
 
 ```{r build-loop-ex-solution}
@@ -1788,7 +1787,7 @@ rcount
 ```
 
 ```{r build-loop-ex-check}
-grade_code("This exercise concludes the chapter on `while` and `for` loops.")
+gradethis::grade_code("This exercise concludes the chapter on `while` and `for` loops.")
 ```
 
 ### Congratulations! You're finished!
