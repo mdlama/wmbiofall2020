@@ -625,8 +625,8 @@ second <- li_df[, 2]
 ```
 
 ```{r blend-ex-1-check}
-grade_result(
-  pass_if(~identical(second, li_df[, 2]))
+gradethis::grade_result(
+  gradethis::pass_if(~identical(second, li_df[, 2]))
 )
 ```
 
@@ -715,8 +715,8 @@ extremes <- second > 25 | second < 5
 ```
 
 ```{r blend-ex-2-check}
-grade_result(
-  pass_if(~identical(extremes, second > 25 | second < 5))
+gradethis::grade_result(
+  gradethis::pass_if(~identical(extremes, second > 25 | second < 5))
 )
 ```
 
@@ -807,8 +807,8 @@ sum(extremes)
 ```
 
 ```{r blend-ex-3-check}
-grade_result(
-  pass_if(~identical(.result, sum(extremes)))
+gradethis::grade_result(
+  gradethis::pass_if(~identical(.result, sum(extremes)))
 )
 ```
 
@@ -999,8 +999,8 @@ The modulo, or remainder, operator `%%` gives us the remainder after division! R
 ```
 
 ```{r modulo-ex-other-check}
-grade_result(
-  pass_if(~identical(.result, 0))
+gradethis::grade_result(
+  gradethis::pass_if(~identical(.result, 0))
 )
 ```
 
@@ -1369,8 +1369,8 @@ while (i <= 10) {
 ```
 
 ```{r while-scratch-ex-check}
-grade_result(
-  pass_if(~identical(i, 8))
+gradethis::grade_result(
+  gradethis::pass_if(~identical(i, 8))
 )
 ```
 
