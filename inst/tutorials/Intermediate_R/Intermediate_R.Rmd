@@ -1868,7 +1868,7 @@ question(
   sprintf("What would the value of `f(TRUE)` be?"),
   answer("TRUE"),
   answer("FALSE"),
-  answer("1", correct=TRUE),
+  answer("2", correct=TRUE),
   answer("0"),
   answer("The function won't work and will throw an error.")
 )
@@ -1996,7 +1996,7 @@ The documentation on the `mean()` function gives us quite some information:
 
 Remember that R can match arguments both by position and by name. Can you still remember the difference? You'll find out in this exercise!
 
-Once more, you'll be working with the view counts of your social network profiles for the past 7 days. These are stored in the `linkedin` and `facebook` vectors and have already been defined in the editor on the right.
+Once more, you'll be working with the view counts of your social network profiles for the past 7 days. These are stored in the `linkedin` and `facebook` vectors and have already been defined in the editor below.
 
 ```{r arg-pos-vs-name-setup}
 linkedin <- c(16, 9, 13, 5, 2, 17, 14)
@@ -2378,7 +2378,14 @@ gradethis::grade_code("Remember, the return() function exits the function with i
 #### Exercise 2: Call the function hello()
 *Call the function* `hello()`*, without specifying arguments of course.*
 
-```{r define-hello-ex-2, exercise=TRUE, exercise.setup="define-hello-ex-1-solution"}
+```{r define-hello-ex-1-setup}
+hello <- function() {
+  print("Hi there!")
+  return(TRUE)
+}
+```
+
+```{r define-hello-ex-2, exercise=TRUE, exercise.setup="define-hello-ex-1-setup"}
 
 ```
 
