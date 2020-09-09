@@ -1156,6 +1156,21 @@ gradethis::grade_code("Feel free to play around some more with your solution by 
 
 **You have finished the chapter "Conditionals and control flow"!**
 
+Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
+
+```{r chap-1-ui, echo=FALSE}
+textInput("name1", "Your name")
+verbatimTextOutput("turnin1")
+```
+
+```{r chap-1-server, context="server"}
+output$turnin1 <- renderText({
+  stamp <- paste("Finished Chapter 1:", Sys.time(), input$name1)
+  paste0(stamp, "\n",
+         digest::digest(stamp, "md5", serialize=FALSE))
+})
+```
+
 ## Chap. 2: Loops
 
 Loops can come in handy on numerous occasions. `while` loops are like repeated if statements; the `for` loop is designed to iterate over all elements in a sequence. Learn all about them in this chapter.
@@ -1803,6 +1818,21 @@ gradethis::grade_code("This exercise concludes the chapter on `while` and `for` 
 ### Congratulations! You've finished Chapter 2!
 
 **You have finished the chapter "Loops"!**
+
+Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
+
+```{r chap-2-ui, echo=FALSE}
+textInput("name2", "Your name")
+verbatimTextOutput("turnin2")
+```
+
+```{r chap-2-server, context="server"}
+output$turnin2 <- renderText({
+  stamp <- paste("Finished Chapter 2:", Sys.time(), input$name2)
+  paste0(stamp, "\n",
+         digest::digest(stamp, "md5", serialize=FALSE))
+})
+```
 
 ## Chap. 3: Functions
 
@@ -2628,14 +2658,14 @@ gradethis::grade_code("Have a look at the results; it appears that the sum of `v
 
 Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
 
-```{r, echo=FALSE}
-textInput("name", "Your name")
-verbatimTextOutput("turnin")
+```{r chap-3-ui, echo=FALSE}
+textInput("name3", "Your name")
+verbatimTextOutput("turnin3")
 ```
 
-```{r, context="server"}
-output$turnin <- renderText({
-  stamp <- paste("Finished Chapter 3:", Sys.time(), input$name)
+```{r chap-3-server, context="server"}
+output$turnin3 <- renderText({
+  stamp <- paste("Finished Chapter 3:", Sys.time(), input$name3)
   paste0(stamp, "\n",
          digest::digest(stamp, "md5", serialize=FALSE))
 })
