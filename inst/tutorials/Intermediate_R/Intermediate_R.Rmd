@@ -1156,21 +1156,6 @@ gradethis::grade_code("Feel free to play around some more with your solution by 
 
 **You have finished the chapter "Conditionals and control flow"!**
 
-Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
-
-```{r, echo=FALSE}
-textInput("name", "Your name")
-verbatimTextOutput("turnin")
-```
-
-```{r, context="server"}
-output$turnin <- renderText({
-  stamp <- paste("Finished Chapter 1:", Sys.time(), input$name)
-  paste0(stamp, "\n",
-         digest::digest(stamp, "md5", serialize=FALSE))
-})
-```
-
 ## Chap. 2: Loops
 
 Loops can come in handy on numerous occasions. `while` loops are like repeated if statements; the `for` loop is designed to iterate over all elements in a sequence. Learn all about them in this chapter.
@@ -1819,21 +1804,6 @@ gradethis::grade_code("This exercise concludes the chapter on `while` and `for` 
 
 **You have finished the chapter "Loops"!**
 
-Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
-
-```{r, echo=FALSE}
-textInput("name", "Your name")
-verbatimTextOutput("turnin")
-```
-
-```{r, context="server"}
-output$turnin <- renderText({
-  stamp <- paste("Finished Chapter 2:", Sys.time(), input$name)
-  paste0(stamp, "\n",
-         digest::digest(stamp, "md5", serialize=FALSE))
-})
-```
-
 ## Chap. 3: Functions
 
 Functions are an extremely important concept in almost every programming language; R is not different. After learning what a function is and how you can use one, you'll take full control by writing your own functions.
@@ -1876,7 +1846,7 @@ question(
 
 Now try it out! Evaluate `f` with input `TRUE` and `FALSE`.
 
-```{r bool-input-ex, exercise=TRUE}
+```{r bool-input-ex, exercise=TRUE, exercise.setup="eval-f-setup"}
 
 ```
 
@@ -1895,13 +1865,13 @@ Many R functions that work on single numbers will also work on vectors by perfor
 
 Try and evaluate the function `f` on different vectors.
 
-```{r vec-input-ex, exercise=TRUE}
+```{r vec-input-ex, exercise=TRUE, exercise.setup="eval-f-setup"}
 
 ```
 
 In general, an R function may have multiple inputs (called **arguments**) and only one output.
 
-```{r, echo=FALSE, out.height="75px",  out.extra="class='center'"}
+```{r, echo=FALSE, out.height="75px", out.extra="class='center'"}
 knitr::include_graphics("images/code_box.png")
 ```
 
@@ -2378,7 +2348,7 @@ gradethis::grade_code("Remember, the return() function exits the function with i
 #### Exercise 2: Call the function hello()
 *Call the function* `hello()`*, without specifying arguments of course.*
 
-```{r define-hello-ex-2, exercise=TRUE}
+```{r define-hello-ex-2, exercise=TRUE, exercise.setup="define-hello-ex-1-solution"}
 
 ```
 
@@ -2410,6 +2380,7 @@ my_fun <- function(arg1, arg2 = val2) {
 
 #### Exercise: Finish the `pow_two()` function
 *The editor below contains an extended version of the `pow_two()` function from before. Can you finish it?*
+
 * *Add an optional argument, named* `print_info`*, that is* `TRUE` *by default.*
 * *Wrap an* `if` *construct around the* `print()` *function: this function should only be executed if* `print_info` *is* `TRUE`*.*
 * *Feel free to experiment with the* `pow_two()` *function you've just coded.*
@@ -2464,7 +2435,7 @@ two_dice <- function() {
 }
 ```
 
-```{r scoping-qu, eval=FALSE}
+```{r scoping-qu, echo=FALSE}
 question(
   "Which statement is correct about the function `two_dice()`? Feel free to check each option in the code editor above if you are unsure.",
   answer("Executing `two_dice()` causes an error."),
@@ -2505,7 +2476,7 @@ b <- increment(count)
 count <- increment(count, 2)
 ```
 
-```{r increment, eval=FALSE}
+```{r increment, echo=FALSE}
 question(
   "Can you tell which one of the following statements is false about the above piece of code?",
   answer("`a` and `b` equal 7 and 6 respectively after executing this code block.", correct=TRUE),
