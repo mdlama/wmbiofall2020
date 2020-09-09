@@ -2659,6 +2659,173 @@ interpret_all(facebook)
 gradethis::grade_code("Have a look at the results; it appears that the sum of `views` on popular days are the same for Facebook and LinkedIn, what a coincidence! Your different social profiles must be fairly balanced.")
 ```
 
+### Are R functions black boxes?
+
+Sometimes functions can be referred to as "black boxes" when you use them but are unable to see their code. A very useful thing to know in R is that for many functions you can easily see their code by printing the function name, or variable, *without parentheses*. For example:
+
+```{r}
+print(sd)
+```
+
+Try it now! 
+
+```{r peek-into-funcs-setup, echo=FALSE}
+interpret <- function(num_views) {
+  if (num_views > 15) {
+    print("You're popular!")
+    return(num_views)
+  } else {
+    print("Try to be more visible!")
+    return(0)
+  }
+}
+
+# Define the interpret_all() function
+# views: vector with data to interpret
+# return_sum: return total number of views on popular days?
+interpret_all <- function(views, return_sum = TRUE) {
+  count <- 0
+
+  for (v in views) {
+    count <- count + interpret(v)
+  }
+
+  # Insert if-else statement on the next line
+  if (return_sum == TRUE) {
+    return(count)
+  } else {
+    return(NULL)
+  }
+}
+```
+
+#### Exercise: Peeking into function code
+*The* `interpret` *and* `interpret_all` *functions from the previous exercise are loaded in memory. Use the* `print` *command to show their code!*
+
+```{r peek-into-funcs, exercise=TRUE, exercise.setup="peek-into-funcs-setup"}
+
+```
+
+```{r peek-into-funcs-solution}
+print(interpret)
+print(interpret_all)
+```
+
+### Functions really are variables!
+
+To drive home the point that functions really are variables (i.e. they are variables with data type "function"), we will revisit a rather embarrassing point in American history known as the [Indiana Pi Bill](https://en.wikipedia.org/wiki/Indiana_Pi_Bill). Here's how the Wikipedia article describes it:
+
+> The Indiana Pi Bill is the popular name for bill #246 of the 1897 sitting of the Indiana General Assembly, one of the most notorious attempts to establish mathematical truth by legislative fiat.
+
+The legislation had the title "A Bill for an act introducing a new mathematical truth and offered as a contribution to education to be used only by the State of Indiana free of cost by paying any royalties whatever on the same, provided it is accepted and adopted by the official action of the Legislature of 1897."  In any case, the bill (and the mathematical "alternative facts" that it contained) implied that the value of $\pi$ was 3.2.
+
+Suppose we had the following extremely simple function inspired by this lovely story. Rather than using 3.2 for $\pi$, we'll round to the nearest hundredth using the very useful `signif` function.
+
+```{r indiana-pi-setup}
+indiana_pi <- function() {
+  return(signif(pi, digits=3))
+}
+```
+
+Rather than re-code the function, let's rename it to something more appropriate.
+
+#### Exercise: Stupify!
+*The function* `indiana_pi` *is already available in your workspace. Assign the function to a new variable named* `round_to_hundredth` *and run the function to make sure it "works".*
+
+```{r indiana-pi-ex, exercise=TRUE, exercise.setup="indiana-pi-setup"}
+
+```
+
+```{r indiana-pi-ex-solution}
+round_to_hundredth <- indiana_pi
+round_to_hundredth()
+```
+
+```{r indiana-pi-ex-check}
+gradethis::grade_code()
+```
+
+### Leci n'est pas une pipe
+
+```{r, echo=FALSE, out.width="50%", out.extra="class='center'"}
+knitr::include_graphics("images/MagrittePipe.jpg")
+```
+
+**The Treachery of Images** is a painting by surrealist painter René Magritte. It was the inspiration (at least in name and design) for one of the most helpful functions/operators in R for data science called *the pipe operator* and denoted `%>%`. This operator is included in the R package `magrittr`, which has the following awesome hex sticker for its package.
+
+```{r, echo=FALSE, out.width="30%", out.extra="class='center'"}
+knitr::include_graphics("images/unnamed.png")
+```
+
+The inspiration for a pipe operator comes about when thinking about how much data processing must be done with data: import data, clean data, rename variables, filter observations, select variables, calculate statistics, ... If each one of these steps is an R function, where the output of one step becomes the input of another, your code can become quickly unreadable as an onion of function calls, with layer-upon-layer of parenthetical embedded statements.  Here's an example using some functions in the tidyverse that we'll learn more about later.
+
+```{r, message=FALSE}
+library(tidyverse)
+
+summarize(group_by(filter(select(read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv"), c(treatment, percent)), percent >= 50), treatment), mean(percent))
+```
+
+What the heck is going on?!?! What a mess. The situation can be improved a bit by some proper formatting of the code (remember, indentations and new lines are your friends - let your code breathe!)
+
+```{r, message=FALSE, eval=FALSE}
+library(tidyverse)
+
+summarize(
+  group_by(
+    filter(
+      select(
+        read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv"), 
+        c(treatment, percent)), 
+      percent >= 50), 
+    treatment), 
+  mean(percent)
+)
+```
+
+That's a little better. We can more easily see the functions that are being called, but it's still hard to see which arguments go with which function (`percent >= 50` goes with `select` or `filter`?) Indentation helps, but still difficult to read. Also, to see the proper order that the functions are called, you have to start in the inside of the "onion" and work your way out. Very confusing! What if we had an operator that matched more our "function box" image?
+
+```{r, echo=FALSE, out.width="50%", out.extra="class='center'"}
+knitr::include_graphics("images/composite_code.png")
+```
+
+We do! That's exactly what the pipe operator `%>%` gives us. In the image above, replace the arrows with the pipe operator. The image of a pipe illustrates that data flows through the functions as input and comes out as output. Here's the same code from above, but now we use the pipe operator.
+
+```{r, message=FALSE}
+read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv") %>%
+  select(c(treatment, percent)) %>%
+  filter(percent >= 50) %>%
+  group_by(treatment) %>%
+  summarize(mean(percent))
+```
+
+So much easier! Now you can actually read the code from left-to-right (or top-to-bottom), and the function arguments are exactly with the function they belong to. 
+
+"But wait!", some of you might be saying. "If a function has multiple arguments, how does the pipe operator know which argument to assign the input on the left to??" Great question! *The pipe operator will assign the left object (the input) to the __first argument__ of the function on the right of the pipe.* As an example, the following two statements are equivalent:
+
+```{r, eval=FALSE}
+# This command...
+filter(mydata, percent >= 50)
+
+# ...is equivalent to this one...
+mydata %>% filter(percent >= 50)
+```
+For the following exercise, we will consider Exercise 32 in Chapter 2 of Whitlock \& Schluter's textbook "The Analysis of Biological Data".
+
+> More than 10% of people carry the parasite *Toxoplasma gondhii*. The following table gives data from Prague on 15- to 29-year old drivers who had been involved in an accident. The table gives the number of drivers who were infected with *Toxoplasma gondhii* and who were uninfected. These numbers are compared with a control sample of 249 drivers of the same age living in the same area who had not been in an accident.
+
+```{r toxo-table, echo=FALSE}
+read.csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv") %>% table()
+```
+
+#### Exercise 1: I love mosaic plots!
+
+ * *First, use `read.csv` to load in the data from their website using the URL https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv and store in the variable `toxoData`.*
+ * *Next, use the `table` command to recreate the table above and store the result in the variable `toxoTable`.*
+ * *Finally, use the `mosaicplot` command with `toxoTable` as the argument to create a mosaic plot.*
+
+```{r}
+```
+
 ### Congratulations! You have finished Chapter 3!
 
 **You have finished the chapter "Functions"!**
