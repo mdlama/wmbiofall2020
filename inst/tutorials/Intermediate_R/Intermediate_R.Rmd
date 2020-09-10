@@ -2522,10 +2522,10 @@ count <- increment(count, 2)
 ```{r increment, echo=FALSE}
 question(
   "Can you tell which one of the following statements is false about the above piece of code?",
-  answer("`a` and `b` equal 7 and 6 respectively after executing this code block.", correct=TRUE),
-  answer("After the first call of `increment()`, where `a` is defined, `a` equals 7 and count equals 5.", correct=TRUE),
-  answer("In the end, `count` will equal 10."),
-  answer("In the last expression, the value of `count` was actually changed because of the explicit assignment.", correct=TRUE)
+  answer("`a` and `b` equal 7 and 6 respectively after executing this code block."),
+  answer("After the first call of `increment()`, where `a` is defined, `a` equals 7 and count equals 5."),
+  answer("In the end, `count` will equal 10.", correct=TRUE),
+  answer("In the last expression, the value of `count` was actually changed because of the explicit assignment.")
 )
 ```
 
