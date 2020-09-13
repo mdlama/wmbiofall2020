@@ -2770,7 +2770,7 @@ Here's an example using some functions in the tidyverse that we'll learn more ab
 ```{r, message=FALSE}
 library(tidyverse)
 
-summarize(group_by(filter(select(read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv"), c(treatment, percent)), percent >= 50), treatment), mean(percent))
+summarize(group_by(filter(select(read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap03q14VasopressinVoles.csv"), c(treatment, percent)), percent >= 50), treatment), mean(percent))
 ```
 
 What the heck is going on?!?! What a mess. The situation can be improved a bit by some proper formatting of the code (remember, indentations and new lines are your friends - let your code breathe!)
@@ -2782,7 +2782,7 @@ summarize(
   group_by(
     filter(
       select(
-        read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv"), 
+        read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap03q14VasopressinVoles.csv"), 
         c(treatment, percent)), 
       percent >= 50), 
     treatment), 
@@ -2799,7 +2799,7 @@ knitr::include_graphics("images/composite_code.png")
 We do! That's exactly what the pipe operator `%>%` gives us. In the image above, replace the arrows with the pipe operator. The image of a pipe illustrates that data flows through the functions as input and comes out as output. Here's the same code from above, but now we use the pipe operator.
 
 ```{r, message=FALSE}
-read_csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter03/chap03q14VasopressinVoles.csv") %>%
+read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap03q14VasopressinVoles.csv") %>%
   select(c(treatment, percent)) %>%
   filter(percent >= 50) %>%
   group_by(treatment) %>%
@@ -2822,12 +2822,12 @@ For the following exercise, we will consider Exercise 32 in Chapter 2 of Whitloc
 > More than 10% of people carry the parasite *Toxoplasma gondhii*. The following table gives data from Prague on 15- to 29-year old drivers who had been involved in an accident. The table gives the number of drivers who were infected with *Toxoplasma gondhii* and who were uninfected. These numbers are compared with a control sample of 249 drivers of the same age living in the same area who had not been in an accident.
 
 ```{r toxo-table, echo=FALSE}
-read.csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv") %>% table()
+read.csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap02q32ToxoplasmaAccidents.csv") %>% table()
 ```
 
 #### Exercise 1: I love mosaic plots!
 
- * *First, use `read.csv` to load in the data from their website using the URL https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv and store in the variable `toxoData`.*
+ * *First, use `read.csv` to load in the data located at https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap02q32ToxoplasmaAccidents.csv and store in the variable `toxoData`.*
  * *Next, use the `table` command to recreate the table above and store the result in the variable `toxoTable`.*
  * *Finally, use the `mosaicplot` command with `toxoTable` as the argument to create a mosaic plot.*
 
@@ -2836,7 +2836,7 @@ read.csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap
 ```
 
 ```{r toxo-ex-1-solution}
-toxoData <- read.csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv")
+toxoData <- read.csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap02q32ToxoplasmaAccidents.csv")
 toxoTable <- table(toxoData)
 mosaicplot(toxoTable)
 ```
@@ -2857,7 +2857,7 @@ library(tidyverse)
 ```
 
 ```{r toxo-ex-2-solution}
-read.csv("https://whitlockschluter.zoology.ubc.ca/wp-content/data/chapter02/chap02q32ToxoplasmaAccidents.csv") %>%
+read.csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/chap02q32ToxoplasmaAccidents.csv") %>%
   table() %>%
   mosaicplot()
 ```
