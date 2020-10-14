@@ -32,6 +32,11 @@ library(digest)
 library(tidyverse)
 ```
 
+```{r stemdata-setup, include=FALSE}
+library(tidyverse)
+stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
+```
+
 ```{r setup, include=FALSE}
 learnr::tutorial_options(
   exercise.timelimit = 15,
@@ -58,13 +63,20 @@ A model of the data life cycle from the free online book ["R for Data Science"](
 
 In the previous tutorial, [Data Manipulation with dplyr](https://mdllama.shinyapps.io/Data_Manipulation), you learned about the tidyverse package `dplyr` and how to use it to **Transform** your data. In this tutorial, we will introduce you to the tidyverse package `ggplot2`, showing you how to use it to **Visualize** your data.
 
+Helpful resources for this tutorial:
+
+ - [ggplot2 Reference](https://ggplot2.tidyverse.org/index.html)
+ - [ggplot2 Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)
+ - [R for Data Science: Data visualisation](https://r4ds.had.co.nz/data-visualisation.html) (Free online book chapter)
+ - [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/) (Free online book)
+
 ## Introduction to ggplot2
 
 ```{r, echo=FALSE, out.height="100px",  out.extra="class='float-left'"}
 knitr::include_graphics("images/hex-ggplot2.png")
 ```
 
-> "ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. You provide the data, tell ggplot2 how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details." <br> <span style="float:right;"> - tidyverse.org</span>
+> "ggplot2 is a system for declaratively creating graphics, based on [The Grammar of Graphics](https://amzn.to/2ef1eWp). You provide the data, tell ggplot2 how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details." <br> <span style="float:right;"> - tidyverse.org</span>
 <div style="clear: both;"></div>
 
 <div style="clear: both;"></div>
@@ -73,13 +85,14 @@ Using `ggplot2` for your data visualization needs is akin to using a powerful ph
 
 Most of the time, part of this mapping of data to visual objects requires some type of *data manipulation* or transformation, as Figure 1 illustrates. In order to truly understand and interpret a visual representation of data, one must know exactly how data is modified and mapped to the resulting plot. Some plots, such as *scatter plots*, are a direct mapping of the data to the image, while others like the bar plot may require some data processing before constructing the plot (e.g. computing frequencies of occurrences of levels for a categorical variable).
 
-With The Grammar of Graphics, we break down the creation of a data visualization into 5 main components:
+With The Grammar of Graphics, we break down the creation of a data visualization into 6 main components:
 
-1. **Data**: Data used for the plot
+1. **Data**: Data used for the plot.
 2. **Aesthetics**: Data generates geometric objects via _mapping_ data to general plot aesthetics (space, color, shape, size, etc.)
 3. **Geoms**: Geometric objects, drawn in layers, that represent the data (points, lines, rectangles, curves, etc.)
-4. **Coordinates**: Coordinate systems and their properties (cartesian, polar, aspect ratios, axes limits, etc.)
-5. **Themes**: Non-data elements of the plot (gridlines, ticks, labels, etc.)
+4. **Statistics**: Processing of data into statistical summaries to show properties of your data, including uncertainty quantification and statistical models.
+5. **Coordinates**: Coordinate systems and their properties (cartesian, polar, aspect ratios, axes limits, etc.)
+6. **Themes**: Non-data elements of the plot (gridlines, ticks, labels, etc.)
 
 As mentioned above, one of the key ideas of _The Grammar of Graphics_ is that visualizations can be composed of multiple layers, with each layer consisting of data, aesthetics, and geometric objects. As mentioned in the 3rd edition of the book [_ggplot2: Elegant Graphics for Data Analysis_](https://ggplot2-book.org/), by Hadley Wickham, Danielle Navarro, and Thomas Lin Pedersen, it is useful to think of each layer of a plot displayed for a purpose:
 
@@ -89,7 +102,9 @@ As mentioned above, one of the key ideas of _The Grammar of Graphics_ is that vi
 
 We map data to geometric objects through _aesthetics_, which is the focus of the next chapter.
 
-## Aesthetics
+Use later: Processing of data into statistical summaries to show properties of your data, including uncertainty quantification and statistical models.
+
+## Aesthetics and Geoms
 
 **Aesthetics** can be thought of as _dimensions_ of general plot objects. For example, the following rectangle has seven aesthetic dimensions: center coordinate (x and y), width, height, border color, box color, and border width.
 
@@ -99,9 +114,9 @@ knitr::include_graphics("images/AestheticsBox.png")
 
 The italicized words inside the parentheses correspond to aesthetic names used in `ggplot2`.
 
-Here's our first `ggplot2` code that can display a rectangle just like this:
+Here's our first `ggplot2` code that can display a rectangle just like the one above:
 
-```{r, fig.align="center"}
+```{r geom-tile}
 ggplot() + 
   geom_tile(mapping = aes(x = 0, y = 0), 
             width = 20, 
@@ -111,8 +126,1392 @@ ggplot() +
             size = 10)
 ```
 
-## Geoms
+The first command (`ggplot()`) creates a blank canvas and is required for all plots using `ggplot2`.
 
-## Coordinates
+```{r blank-canvas}
+ggplot()
+```
 
-## Themes
+The `+` command is similar to the data pipe `%>%` and can be thought of as either adding an additional layer to the plot (like in this case the tile geometric object) or adjusting parameters of the plot.
+
+This is our first introduction to a **geom**, in this case `geom_tile`. 
+
+> A **geom** is a plot algorithm that uses specified aesthetics to construct a geometric object in the coordinate plane.
+
+In this case, the `geom_tile` function creates a rectangle using the aesthetics we specified above. Note that there is a similar geom, `geom_rect`, that will draw a rectangle using different aesthetics: in place of `x`, `y`, `width`, and `height`, `geom_rect` uses `xmin`, `xmax`, `ymin`, and `ymax`. For example, the same rectangle can be specified using the following bit of code.
+
+```{r, fig.align="center"}
+ggplot() + 
+  geom_rect(mapping = aes(xmin = -10, xmax = 10, ymin = -5, ymax = 5),
+            color = "green", 
+            fill = "red",
+            size = 10)
+```
+
+Which geom you use depends on which aesthetic specification is more convenient.
+
+### Specifying aesthetics: Mappings or values?
+
+In the commands above, you maybe have noticed some aesthetics are wrapped in the `aes()` function, which is then assigned to the `mapping` argument of the geom function, while others are specified as direct arguments to the geom function. Why the distinction? For right now, the rule is (1) required aesthetics for a geom need to be specified within the `aes()` function and assigned to the `mapping` variable, and (2) optional aesthetics for a geom can be specified as direct arguments to the geom function. We'll learn a more general rule later.
+
+#### Exercise: Default aesthetics
+*Plot a rectangle using* `geom_tile` *centered at (x,y) = (4, 7). Do not specify any other aesthetics.*
+
+```{r one-tile-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+
+```
+
+```{r one-tile-ex-1-hint-1}
+ggplot() +
+  geom_tile(___)
+```
+
+```{r one-tile-ex-1-hint-2}
+ggplot() +
+  geom_tile(mapping = aes(___))
+```
+
+```{r one-tile-ex-1-solution}
+ggplot() +
+  geom_tile(mapping = aes(x = 4, y = 7))
+```
+
+```{r one-tile-ex-1-check}
+gradethis::grade_code()
+```
+
+It looks like the default aesthetics for a tile geom is a width and height of 1, no border, and a dark grey fill.
+
+#### Exercise: Add some color
+*Plot a rectangle using* `geom_rect` *with the bottom-left corner at (x,y) = (0,0) and upper-right corner at (2,4). Also set the fill to* `forestgreen` *and the color to* `goldenrod1`.
+
+```{r one-tile-ex-2, exercise=TRUE, exercise.setup="tidyverse-setup"}
+
+```
+
+```{r one-tile-ex-2-hint-1}
+ggplot() +
+  geom_rect(mapping = aes(___))
+```
+
+```{r one-tile-ex-2-hint-2}
+ggplot() +
+  geom_rect(mapping = aes(xmin = ___, ymin = ___, xmax = ___, ymax = ___))
+```
+
+```{r one-tile-ex-2-hint-3}
+ggplot() +
+  geom_rect(mapping = aes(xmin = 0, ymin = 0, xmax = 2, ymax = 4))
+```
+
+```{r one-tile-ex-2-solution}
+ggplot() +
+  geom_rect(mapping = aes(xmin = 0, ymin = 0, xmax = 2, ymax = 4),
+            fill = "forestgreen",
+            color = "goldenrod1")
+```
+
+```{r one-tile-ex-2-check}
+gradethis::grade_code()
+```
+
+Looks like a super small border size! The default is set to 0.1.
+
+### Multiple geoms: Using layers
+
+Suppose we wanted two rectangles such that:
+
+ (1) Rectangle #1 is the same as above, and
+ (2) Rectangle #2 is centered at the upper right corner of Rectangle #1, with all other aesthetics the same except fill is black and the border is blue.
+ 
+How can we create these? With `ggplot2`, all you have to do is combine two `geom_tile` geom specifications with a `+` sign.
+
+```{r}
+ggplot() +
+  geom_tile(mapping = aes(x = 0, y = 0), # red and green rectangle
+            width = 20, 
+            height = 10,
+            color = "green", 
+            fill = "red", 
+            size = 10) +
+  geom_tile(mapping = aes(x = 10, y = 5), # black and blue rectangle
+            width = 20,
+            height = 10,
+            color = "blue",
+            fill = "black",
+            size = 10)
+```
+
+As you can see, the second layer (black and blue rectangle) is *on top of* the first layer (red and green rectangle).
+
+#### Exercise: Change the order of the layers
+*Repeat the code above that created the two rectangles, but this time call the black and blue* `geom_tile` *first. What do you expect to happen?*
+
+```{r layers-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+
+```
+
+```{r layers-ex-1-solution}
+ggplot() +
+  geom_tile(mapping = aes(x = 10, y = 5), # black and blue rectangle
+            width = 20, 
+            height = 10,
+            color = "blue", 
+            fill = "black", 
+            size = 10) +
+  geom_tile(mapping = aes(x = 0, y = 0), # red and green rectangle
+            width = 20,
+            height = 10,
+            color = "green",
+            fill = "red",
+            size = 10)
+```
+
+```{r layers-ex-1-check}
+gradethis::grade_code()
+```
+
+Remember the analogy to image processing programs like Photoshop: each geom is a *layer*, and the layers are drawn on top of each other in the order they are specified. What if we still want to see the object behind the other one? Each geom has an *alpha transparency* aesthetic that allows you to _see through_ each layer.
+
+#### Exercise: Specify transparency
+*Set the value of the red and green rectangle's transparency (or aesthetic* `alpha`*) to 0.6.*
+
+```{r transp-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+ggplot() +
+  geom_tile(mapping = aes(x = 10, y = 5), # black and blue rectangle
+            width = 20, 
+            height = 10,
+            color = "blue", 
+            fill = "black", 
+            size = 10) +
+  geom_tile(mapping = aes(x = 0, y = 0), # red and green rectangle
+            width = 20,
+            height = 10,
+            color = "green",
+            fill = "red",
+            size = 10)
+```
+
+```{r transp-ex-1-solution}
+ggplot() +
+  geom_tile(mapping = aes(x = 10, y = 5), # red and green rectangle
+            width = 20, 
+            height = 10,
+            color = "blue", 
+            fill = "black", 
+            size = 10) +
+  geom_tile(mapping = aes(x = 0, y = 0), # black and blue rectangle
+            width = 20,
+            height = 10,
+            color = "green",
+            fill = "red",
+            size = 10,
+            alpha = 0.6)
+```
+
+```{r transp-ex-1-check}
+gradethis::grade_code()
+```
+
+### Multiple geoms: Utilizing the data frame
+
+What if we want to draw lots of tiles/rectangles at the same time, with many of them sharing the same aesthetics? We could add a new `geom_tile` layer every time we wanted a new tile, but this could quickly get out of hand. A shortcut is to create a data frame that stores the aesthetics that vary across rectangles. For example, if we wanted to draw the two rectangles above, but this time keep them both the same colors to make things easier, we could create a data frame or tibble with differing center coordinates as follows (see [this link](https://rstudio-education.github.io/tidyverse-cookbook/tidy.html#create-a-tibble-manually) for an introduction to tribbles):
+
+```{r tribble}
+tiles <- tribble(
+  ~xcoord, ~ycoord,
+  10, 5,
+  0, 0
+)
+```
+
+With this data frame, we can then pass the `tiles` data to `ggplot` and *map* the aesthetics to the corresponding variables in the data, as follows:
+
+```{r map-aesthetics}
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = xcoord, y = ycoord),
+            width = 20,
+            height = 10,
+            size = 10,
+            fill = "red",
+            color = "green")
+```
+
+Nice! What we see is that rather than needing two `geom_tile` commands, we only need one by passing in the variable aesthetics as a data frame and mapping those variables to appropriate aesthetics. Each row of the data frame corresponds to aesthetics for an individual tile.
+
+We can now discuss in full generality which aesthetics go in the `aes()` function and get assigned to the `mapping` argument, and which aesthetics go outside the `aes()` function as arguments to the geom.
+
+> Aesthetics that are **mapped from variables** in a data frame or tibble should be set in the `aes()` function and assigned to the `mapping` argument. Aesthetics that are **not mapped from variables**, but are instead meant to be _constant_ across all geom instances, can be assigned as direct arguments to the geom. The only exception to the constant aesthetic rule is when the aesthetic is required - in this case, it needs to be given within the `aes()` function.
+
+Why did this example not have varying colors and fills, as the previous examples did? To specify varying colors in the data requires a discussion about **scales**, which we will get to in the next section of this tutorial.
+
+#### Exercise: Go Tribe (x4)!
+*Draw four rectangles with the following properties:*
+
+ - *One rectangle each centered at (1,1), (1,-1), (-1,-1), and (-1,1).*
+ - *Fill is* `forestgreen` *and border (*`color`*) is *`goldenrod1`*.*
+ - *Width and height are both 1.*
+ - *Size of border is 2.*
+*Do this by first creating a data frame or tibble named* `tiles` *that stores the* `x` *and* `y` *values (which vary across rectangles), and then pass this data to the* `ggplot` *function. Note that the other aesthetics _do not vary_ across the four rectangles (i.e. are constants).*
+
+```{r go-tribe-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+
+```
+
+```{r go-tribe-ex-1-hint-1}
+tiles <- tribble(
+  ___
+)
+
+ggplot() +
+  geom_tile(___)
+```
+
+```{r go-tribe-ex-1-hint-2}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1
+)
+
+ggplot(data = ___) +
+  geom_tile(mapping = aes(___))
+```
+
+```{r go-tribe-ex-1-hint-3}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1
+)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            ___)
+```
+
+```{r go-tribe-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1")
+```
+
+```{r go-tribe-ex-1-check}
+gradethis::grade_code()
+```
+
+The `geom_rect` and `geom_tile` geoms are examples of *primitive geoms*. Primitive geoms map the aesthetics to the geometric objects *directly and without any additional transformations*. Primitive geoms are the "what-you-code-is-what-you-get" type of geoms. There are two other main primitive geoms for drawing one-dimensional objects (**line segments**) and zero-dimensional objects (**points**):
+
+ - **Points** are drawn with `geom_point` and require the aesthetics `x` and `y`.
+ - **Lines** are drawn with `geom_segment` and require the aesthetics `x`, `y`, `xend` and `yend`.
+ 
+#### Exercise: Adding points
+*Starting with the four rectangles from the previous exercise, add points of size 5 at the center of the rectangles.*
+
+```{r adding-points-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1")
+```
+
+```{r adding-points-ex-1-hint-1}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(___)
+```
+
+```{r adding-points-ex-1-hint-2}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(mapping = aes(___))
+```
+
+```{r adding-points-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(mapping = aes(x = x, y = y),
+             size = 5)
+```
+
+```{r adding-points-ex-1-check}
+gradethis::grade_code()
+```
+
+#### Exercise: Adding line segments
+*Starting with the data and geoms from the previous two exercises (rectangles and points), add line segments that connect:*
+
+ - *Point (1,1) to point (1,-1)*
+ - *Point (1,-1) to point (-1,-1)*
+ - *Point (-1,-1) to point (-1,1)*
+ - *Point (-1,1) to point (1,1)*
+
+```{r adding-lines-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(mapping = aes(x = x, y = y),
+             size = 5)
+```
+
+```{r adding-lines-ex-1-hint-1}
+tiles <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  1, 1, 1, -1,
+  1, -1, -1, -1,
+  -1, -1, -1, 1,
+  -1, 1, 1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(mapping = aes(x = x, y = y),
+             size = 5) +
+  geom_segment(mapping = aes(___),
+               size = ___)
+```
+
+```{r adding-lines-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  1, 1, 1, -1,
+  1, -1, -1, -1,
+  -1, -1, -1, 1,
+  -1, 1, 1, 1)
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(mapping = aes(x = x, y = y),
+             size = 5) +
+  geom_segment(mapping = aes(x = x, y = y, xend = xend, yend = yend),
+               size = 1)
+```
+
+```{r adding-lines-ex-1-check}
+gradethis::grade_code()
+```
+
+### Multiple geoms: Setting defaults
+
+You may have noticed in the last exercise that there were some repetitive aesthetic mappings. Which aesthetics were mapped to the same variables in all geoms? The _x_ and _y_ aesthetics! In this case, we could specify these aesthetics in the `ggplot()` function.
+
+```{r}
+tiles <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  1, 1, 1, -1,
+  1, -1, -1, -1,
+  -1, -1, -1, 1,
+  -1, 1, 1, 1
+)
+
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1)
+```
+
+Specify aesthetic mappings in the `ggplot()` function is akin to _setting default aesthetic mappings for all of your geoms to follow_. You can override those defaults for any subsequent geom layer you specify.
+
+## Scales, Statistics and Positions
+
+The next two concepts, *scales* and *statistics*, dig a little deeper under the hood of `ggplot2` and detail how your original data is mapped to the visual aesthetics.
+
+### Scales
+
+```{r, echo=FALSE, out.height="100px",  out.extra="class='float-left'"}
+knitr::include_graphics("images/hex-scales.png")
+```
+
+> Scales in `ggplot2` define how your data is mapped to visual aesthetics, including the handling of axes and legends.
+<div style="clear: both;"></div>
+
+Scales are somewhat unique in their actions and results, depending intimately on which aesthetic they correspond to. However, the two most important "scale types" include:
+
+ - Location scales, like `x` and `y` (which get mapped to **axes**)
+ - Color scales, like `fill` and `color` (which get mapped to **legends**) 
+ - Other scales, like `size` and `linetype` (which also get mapped to **legends**)
+
+All scales in `ggplot2` are functions of the form `scale_<aesthetic>_<scale name>()`. If an aesthetic is mapped, either explicitly in your code or implicitly by `ggplot2`, a default scale is used. Calling the appropriate scale function will allow the user to override the defaults.
+
+Axes and legends are collectively known as **guides** in `ggplot2`. To control guides, every scale function has the three arguments in the table below:
+
+| **Argument name** | **Axis**           | **Legend** |
+| :---------------- | :----------------- | :--------- |
+| `name`            | Label              | Title      |
+| `breaks`          | Ticks & grid lines | Key        |
+| `labels`          | Tick label         | Key label  |
+
+```{r, echo=FALSE, out.width="400px", out.extra="class='center'"}
+knitr::include_graphics("images/scale-guides.png")
+```
+
+Let's go into the two main types of scales individually, starting with _location scales_.
+
+#### Location scales
+
+Location scales perform the following:
+
+ - **Set axes labels**
+ - **Set tick marks and labels**
+ - **Adjust axes limits**
+ - **Axis transformations**
+
+The most important scale functions for location aesthetics are `scale_x_discrete()`, `scale_x_continuous()`, `scale_y_discrete()`, and `scale_y_continuous()`. The choice of `discrete` or `continuous` should depend, of course, on whether the mapped variable is discrete or continuous.
+
+##### Location scales: Set axes labels
+
+To apply a scale for an aesthetic, you add the scale as if it were a geom with the `+` operator. Note that this is a little inaccurate - you are not adding a scale so much as you are modifying the existing default scale.
+
+In the following example, we will modify the horizontal and vertical axis labels by setting the `name` argument in the `scale_x_continuous` and `scale_y_continuous` functions.
+
+```{r}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis") +
+  scale_y_continuous(name = "Vertical Axis")
+```
+
+Note that there is a helper function in `ggplot2` for setting labels for all axes and legends: the `labs` function. You use the `labs` function as follows:
+
+```{r, eval=FALSE}
+labs(
+  <aesthetic> = <label name>,
+  <aesthetic> = <label name>,
+  ...)
+```
+
+Here is an example that applies the same axes labels as before:
+```{r}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  labs(x = "Horizontal Axis",
+       y = "Vertical Axis")
+```
+
+The `tiles` dataset below will be available for the next few exercises.
+
+```{r tiles-setup, include=FALSE}
+library(tidyverse)
+tiles <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  1, 1, 1, -1,
+  1, -1, -1, -1,
+  -1, -1, -1, 1,
+  -1, 1, 1, 1
+)
+```
+
+##### Exercise: Set tick marks
+*Starting with the previous plot, change the tick marks by setting the* `breaks` *argument for each of the* `x` *and* `y` *scales. Create ticks that go from -1.5 to 1.5 in increments of 0.5. Hint: Use the* `seq` *function for the tick marks!*
+
+> The `breaks` argument is a numeric vector of positions.
+
+```{r tick-marks-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis") +
+  scale_y_continuous(name = "Vertical Axis")
+```
+
+```{r tick-marks-ex-1-solution}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis",
+                     breaks = seq(-1.5, 1.5, by = 0.5)) +
+  scale_y_continuous(name = "Vertical Axis",
+                     breaks = seq(-1.5, 1.5, by = 0.5))
+```
+
+```{r tick-marks-ex-1-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Set tick marks and labels
+*Replicate the tick marks and labels for the following plot. Use the scale argument* `labels` *to set the labels as seen below.*
+
+> The `labels` argument is a character vector giving labels (must be same length as `breaks`).
+
+```{r, echo=FALSE, fig.width=4}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis",
+                     breaks = c(-1, 1),
+                     labels = c("A", "B")) +
+  scale_y_continuous(name = "Vertical Axis",
+                     breaks = c(-1, 1),
+                     labels = c("C", "D"))
+```
+
+```{r scale-labels-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1)
+```
+
+```{r scale-labels-ex-1-hint-1}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis",
+                     breaks = c(__, __),
+                     labels = c(__, __)) +
+  scale_y_continuous(name = "Vertical Axis",
+                     breaks = c(__, __),
+                     labels = c(__, __))
+```
+
+```{r scale-labels-ex-1-solution}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(name = "Horizontal Axis",
+                     breaks = c(-1, 1),
+                     labels = c("A", "B")) +
+  scale_y_continuous(name = "Vertical Axis",
+                     breaks = c(-1, 1),
+                     labels = c("C", "D"))
+```
+
+```{r scale-labels-ex-1-check}
+gradethis::grade_code()
+```
+
+See ["Position scales and axes"](https://ggplot2-book.org/scale-position.html) for more advanced specifications.
+
+##### Exercise: Adjust axes limits
+*We can also modify a location aesthetic scale to change the limits of the axis by using the* `limits` *argument. Starting with the plot below, constrain the x axis so that* $0 \leq x \leq 2$*.*
+
+> The `limits` argument is a numeric vector of length two providing limits of the scale. Use NA to refer to the existing minimum or maximum.
+
+```{r limits-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1)
+```
+
+```{r limits-ex-1-solution}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(limits = c(0, 2))
+```
+
+```{r limits-ex-1-check}
+gradethis::grade_code()
+```
+
+What, what?? What happened to our horizontal lines?! Setting the limits using the scale functions by default is different than just zooming in. By default, `ggplot2` will set the values of any data outside the limits to NA. Thus, the horizontal lines in this example will have one endpoint set to NA, and therefore _will not be drawn_. Thus, the default behavior in ggplot2 is to zoom **and** clip. 
+
+What if you want to keep the values that are "out of bounds" (i.e. no clipping)? There is an argument to the scales function called `oob` that specifies this. By default, the argument is `oob = scales::oob_censor` which, as we stated previously, sets out of bound values to NA. This notation says _"use the_ `oob_censor()` _function in the_ `scales` _package to handle data that is out of bounds."_ 
+
+[This reference sheet](https://scales.r-lib.org/reference/oob.html) lists all of the options for handling out of bound data. Probably the most important other `oob` function is `scales::oob_keep`, which will keep the data, thereby performing a more standard zoom.
+
+##### Exercise: No clipping!
+*Change the default out-of-bound behavior by setting the* `oob` *argument for the* `x` *scale to* `scales::oob_keep`*.*
+
+```{r oob-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(limits = c(0, 2))
+```
+
+```{r oob-ex-1-solution}
+ggplot(data = tiles,
+       mapping = aes(x = x, y = y)) +
+  geom_tile(width = 1,
+            height = 1,
+            size = 2,
+            fill = "forestgreen",
+            color = "goldenrod1") +
+  geom_point(size = 5) +
+  geom_segment(mapping = aes(xend = xend, yend = yend),
+               size = 1) +
+  scale_x_continuous(limits = c(0, 2),
+                     oob = scales::oob_keep)
+```
+
+```{r oob-ex-1-check}
+gradethis::grade_code()
+```
+
+That's better! But wait - why is _clip_ (`oob_censor`) and not _zoom_ (`oob_keep()`) the default behavior? Clipping will make more sense when we discuss statistics later in this tutorial.
+
+##### Location scales: Axis transformations
+
+Besides setting axes labels, tick marks, and clipping/zooming windows, scales can also explicitly define the transformation from your data to the aesthetic (axis). By default, location scales do NOT perform a transformation, i.e. they perform an identity mapping between your data and the axes. There are times, however, when you will want to change this. We will cover one of the more common transformations - log transformations.
+
+To illustrate transformations, let's revisit the milkweed data. The following creates a scatter plot of herbivory average versus apical stem height in June (cm). For simplicity, we first filter out where herbivory average is 0.
+
+```{r stemdata-scatter}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot() +
+  geom_point(aes(x = h_apical,
+                 y = herb_avg))
+```
+
+Hmmm, it looks like most of the data is scrunched along the y-axis near 0. It might be nice to stretch the vertical axis near zero (kind of like a nonlinear zoom), while not stretching (or even shrinking) the vertical axis near the maximum of 6. A common way to do this is to use a log transformation. We can specify a log transformation by setting the `trans` argument of the y aesthetic scale to `log10`.
+
+```{r stemdata-scatter-log}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot() +
+  geom_point(aes(x = h_apical,
+                 y = herb_avg)) +
+  scale_y_continuous(trans = "log10")
+```
+
+Note that the y axis label and values of the tick marks on the vertical axis are still showing the units of the data (herbivory average is measured from 0 to 6), and that while the tick marks are evenly spaced, the differences between tick marks are not!
+
+> Rather than transforming the data, scale transformations are best thought of as nonlinear zooming along the relevant axis. 
+ 
+It appears that 0-0.3 was _stretched_, whereas 0.3-6 was _squished_, and that the rate of stretching and squishing varies across the axis (proportional to the derivative of the scaling function at each point).
+
+To illustrate the difference between transforming the data and transforming the axis, let's perform the same plot but calculate ourselves the log (base 10) of herbivory average.
+
+```{r}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  mutate(log_herb_avg = log10(herb_avg)) %>%
+  ggplot() +
+  geom_point(aes(x = h_apical,
+                 y = log_herb_avg))
+```
+
+You'll notice that (1) the label is now `log_herb_avg`, and (2) the minimum is around -1.5 in this plot, which corresponds to $10^{-1.5} \approx 0.03$ on the previous plot. Thus, the vertical axis is now showing the exponents, which while accurately depicting the log scale can be harder to interpret.
+
+###### Exercise: 
+
+#### Color scales
+
+Besides location aesthetics, the most commonly used aesthetic is based on color (via `color` or `fill`).
+
+Color scales perform many of the same actions as location scales:
+
+ - **Define palettes**
+ - **Set legend titles**
+ - **Set legend keys and key labels**
+ - **Adjust key limits**
+ - **Key transformations**
+
+There are many different palettes available in `ggplot2`, each of which depends strongly on whether the data mapping to the aesthetic is discrete or continuous. The following table summarizes the main ggplot2 color scales:
+
+| Palette | Discrete | Continuous | Resources |
+| :------ | :------- | :--------- | :-------- |
+| [HCL](https://ggplot2.tidyverse.org/reference/scale_hue.html) (_default_)| `scale_*_hue` | - | [More info...](http://hclwizard.org/) |
+| [Viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html) | `scale_*_viridis_d` | `scale_*_viridis_c` | [More info...](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) |
+| [ColorBrewer](https://ggplot2.tidyverse.org/reference/scale_brewer.html) | `scale_*_brewer` | `scale_*_distiller` | [More info...](https://colorbrewer2.org) |
+| [Gradient](https://ggplot2.tidyverse.org/reference/scale_gradient.html) | - | `scale_*_gradient` | [More info...](https://scales.r-lib.org//reference/seq_gradient_pal.html) |
+
+##### Color scales: Define palettes
+
+While location scales by default map data directly to their respective axes with no changes (i.e. they perform an identity mapping), this is not so for color. This is because there is no inherent natural way to map a continuous or discrete variable to a color scale. Which scale do we use? There are infinitely many of them!
+
+By default, `ggplot2` maps to the [HCL color scale](http://hclwizard.org/#hcl-color-space) (H = Hue, C = Chroma, L = Luminance), which is a color scale that apparently maps well to human color perception.
+
+Let's revisit our four rectangles to illustrate this. This time, though, we will allow the fill color for each rectangle to vary, and thus will include the fill as a variable in the `tiles` dataset.
+
+###### Exercise: Mapping color
+*Run the following code and then modify it by assigning the* `fill` *variable in the* `tiles` *data to the* `fill` *aesthetic.*
+
+```{r mapping-color-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+tiles <- tribble(
+  ~x, ~y, ~fill,
+  1, 1, "forestgreen",
+  1, -1, "goldenrod1",
+  -1, -1, "forestgreen",
+  -1, 1, "goldenrod1")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y),
+            width = 1,
+            height = 1,
+            size = 2)
+```
+
+```{r mapping-color-ex-1-hint}
+tiles <- tribble(
+  ~x, ~y, ~fill,
+  1, 1, "forestgreen",
+  1, -1, "goldenrod1",
+  -1, -1, "forestgreen",
+  -1, 1, "goldenrod1")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = ___),
+            width = 1,
+            height = 1,
+            size = 2)
+```
+
+```{r mapping-color-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~fill,
+  1, 1, "forestgreen",
+  1, -1, "goldenrod1",
+  -1, -1, "forestgreen",
+  -1, 1, "goldenrod1")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = fill),
+            width = 1,
+            height = 1,
+            size = 2)
+```
+
+```{r mapping-color-ex-1-check}
+gradethis::grade_code()
+```
+
+Huh? That's not right at all! What are those colors? Impostors!! 
+
+Okay, well, they're not so bad - they are two equally distant (in hue) colors in HCL color space and represent ggplot2's default color palette. You can see these colors by using functions from the `scales` package as follows:
+
+```{r}
+scales::show_col(
+  scales::hue_pal()(2)
+)
+```
+
+It looks like "forestgreen" is mapped to "#F8766D" and "goldenrod1" is mapped to "#00BFC4". These hash-tag numbers are called hexidecimal numbers and are often used to specify color on websites (see the [color-hex website](https://www.color-hex.com/) for more information - and fun! It's like being in a paint store...). 
+
+So how do we get the colors that are directly listed in the data? After all, our current `tiles` data is already representing aesthetic data. One way is to tell `ggplot2` that we want it to behave more like a location scale and use an identity mapping, which we can do by specifying the `scale_fill_identity()` function.
+
+###### Exercise: Identity color scale
+*Starting with the plot below, add the* `scale_fill_identity()` *function at the end.*
+
+```{r scale-fill-identity-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+tiles <- tribble(
+  ~x, ~y, ~fill,
+  1, 1, "forestgreen",
+  1, -1, "goldenrod1",
+  -1, -1, "forestgreen",
+  -1, 1, "goldenrod1")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = fill),
+            width = 1,
+            height = 1,
+            size = 2)
+```
+
+```{r scale-fill-identity-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~fill,
+  1, 1, "forestgreen",
+  1, -1, "goldenrod1",
+  -1, -1, "forestgreen",
+  -1, 1, "goldenrod1")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = fill),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_identity()
+```
+
+```{r scale-fill-identity-ex-1-check}
+gradethis::grade_code()
+```
+
+That was easy! Basically, `scale_fill_identity()` tells `ggplot2` that the data already specifies the desired aesthetic values. However, most of the time our categorical data doesn't store actual color names. For example, suppose our data looked more like this:
+
+```{r}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+```
+
+In this case, we can't use `scale_fill_identity()` since the levels of the `royalty` variable aren't color names. This is where the `scale_fill_manual()` comes into play, where you can specify how to map the levels of the discrete `royalty` variable to colors (i.e. _we_ get to specify the mapping of data to aesthetics).
+
+###### Exercise: Manual color mapping
+*Starting with the updated data below, add the* `scale_fill_manual()` *function and set the argument* `values` *equal to a named vector such that* `william` *gets mapped to* `forestgreen` *and* `mary` *gets mapped to* `goldenrod1`.
+
+*Here is the definition of the* `values` *argument from the ggplot2 reference.*
+
+> In `scale_*_manual()`, the argument `values` is a set of aesthetic values to map data values to. The values will be matched in order (usually alphabetical) with the limits of the scale, or with breaks if provided. If this is a named vector, then the values will be matched based on the names instead.
+
+```{r scale-manual-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2)
+```
+
+```{r scale-manual-ex-1-hint}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = ___, 
+                               "mary" = ___))
+```
+
+```{r scale-manual-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"))
+```
+
+```{r scale-manual-ex-1-check}
+gradethis::grade_code()
+```
+
+Note that we get a legend this time telling us how the fill aesthetic colors map back to the original data.
+
+##### Color scales: Set legend titles, keys, and key labels
+
+```{r}
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"),
+                    limits = c("william", "mary"))
+```
+
+##### Color scales: Adjust key limits
+
+```{r}
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"),
+                    limits = c("mary"))
+```
+
+##### Color scales: Transformations
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  scale_color_viridis_c() + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10") + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", na.value = "red") + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", na.value = NA) + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", na.value = NA, direction = -1) + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_gradient2(low = "forestgreen", 
+                        mid = "white", 
+                        high = "goldenrod1", 
+                        midpoint = 3,
+                        na.value = "forestgreen") + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_gradient2(low = "forestgreen", 
+                        mid = "white", 
+                        high = "goldenrod1", 
+                        midpoint = 3,
+                        na.value = "forestgreen") + 
+  scale_y_continuous(limits = c(0, 200)) +
+  theme_dark()
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_gradient2(low = "forestgreen", 
+                        mid = "white", 
+                        high = "goldenrod1", 
+                        midpoint = mean(stemdata$herb_avg, na.rm = TRUE),
+                        na.value = "forestgreen") + 
+  scale_y_continuous(limits = c(0, 200)) +
+  theme_dark()
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_gradient2(low = "forestgreen", 
+                        mid = "white", 
+                        high = "goldenrod1", 
+                        midpoint = log10(mean(stemdata$herb_avg, na.rm = TRUE)),
+                        na.value = "forestgreen",
+                        trans = "log10") + 
+  scale_y_continuous(limits = c(0, 200)) +
+  theme_dark()
+```
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 fill = herb_avg), 
+             alpha = 0.5,
+             shape = 21) + 
+  scale_fill_gradient2(low = "forestgreen", 
+                        mid = "white", 
+                        high = "goldenrod1", 
+                        midpoint = log10(mean(stemdata$herb_avg, na.rm = TRUE)),
+                        na.value = "forestgreen",
+                        trans = "log10") + 
+  scale_y_continuous(limits = c(0, 200)) +
+  theme_dark()
+```
+
+### Statistics
+
+So far we've created some _primitive geoms_ using `ggplot2`. With primitive geoms, there is no additional data processing that occurs between your data and what gets mapped to aesthetics in the plot (except any transformations from the scales). However, almost all plots and graphs of interest involve computing some statistical summaries of interest and then displaying those statistical summaries using multiple primitive geoms. Thus begins our foray into `ggplot2`'s use of **statistics**, or `stat`s in ggplot2 lingo.
+
+#### Bar plots
+
+Let's start by creating a bar plot. We create a bar plot when
+
+ - the explanatory variable is categorical, and
+ - we want to display a statistical summary which is numerical.
+
+Using multiple techniques, we are going to create the following bar plot showing the number of plants in each site.
+```{r, echo=FALSE, fig.align="center"}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site))
+```
+
+The most common case for a bar plot is when we have one categorical variable and we want to count the number of occurrences of each category in the data. In order to do this, we create a contingency table consisting of the categories (or levels) of the variable and the counts of each level in the data.
+
+<<SHOW PICTURE OF DATA -> CONTINGENCY TABLE>>
+
+Once this is complete, we then create rectangles for each category with a minimum y-value at 0 and a maximum y-value at the number of occurrences for that category. We usually also make the bar widths such that they do not touch (to signify visually that the variable is categorical).
+
+##### Exercise: Create a contingency table using `dplyr`
+```{r contingency-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
+plotdata <- stemdata %>%
+  group_by(___) %>%
+  summarize(___)
+```
+
+```{r contingency-ex-1-solution}
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n())
+```
+
+```{r contingency-ex-1-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Create aesthetics
+
+```{r contingency-ex-2-setup, include=FALSE}
+library(tidyverse)
+stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n())
+```
+
+```{r contingency-ex-2, exercise=TRUE, exercise.setup="contingency-ex-2-setup"}
+plotdata <- plotdata %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-2-solution}
+plotdata <- plotdata %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-2-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Map to `geom_rect` geoms
+
+```{r contingency-ex-3-setup, include=FALSE}
+library(tidyverse)
+stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-3, exercise=TRUE, exercise.setup="contingency-ex-3-setup", fig.align="center"}
+ggplot(data = plotdata) +
+  geom_rect(aes(___))
+```
+
+```{r contingency-ex-3-solution}
+ggplot(data = plotdata) +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax))
+```
+
+```{r contingency-ex-3-check}
+gradethis::grade_code()
+```
+
+All in one pipeline:
+```{r, fig.align="center"}
+stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count) %>%
+  ggplot() +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax)
+  )
+```
+
+What about tick labels? Axes labels? We'll learn about setting those later. Before we go there, let's look at our first complex geom `geom_bar` that automates a lot of this process. Here's the command in `ggplot2` using the `geom_bar` geom that performs this data processing and aesthetic mappings free of charge:
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site))
+```
+
+The `geom_bar` geom performs a lot of things in this example:
+
+ 1. Use the statistic `stat_count()` to compute the contingency table of the number of plants in each site.
+ 2. Create default values for the `xmin`, `xmax`, `ymin`, and `ymax` based on parameters for the bars and the counts from the contingency table.
+ 3. Plot the results using `geom_rect` geoms and assign tick labels and axes labels automatically based on the raw and calculated data from the statistic.
+
+```{r, echo=FALSE, out.width="95%", out.extra="class='center'", fig.cap="Figure 1. (1) Count all plants within each site using the `count` statistic, (2) compute aesthetics for the bars (xmin, xmax, ymin, ymax), and (3) map those aesthetics to the coordinate plane (in this case using `geom_rect` primitive)."}
+knitr::include_graphics("images/statistics.png")
+```
+
+As mentioned above, by default, `geom_bar` uses the `count` statistic. You can manually specify the statistic by specifying the `stat` argument as a string to the geom. Also note that, by default, `geom_bar` maps the computed `count` statistic to the `y` aesthetic. The following command is fully explicit but performs the same action as above.
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site,
+               y = after_stat(count)),
+           stat = "count")
+```
+
+Another very important statistic is the "identity" statistic, which effectively skips the statistic step and goes straight to the aesthetic mapping step. One possible use of this is if we want a bar plot _but we already have the heights of the bars_. So, for example, we could create the bar plot above by first counting the plants in each site ourselves (i.e. doing the count statistic manually) and then pass that processed data to the `geom_bar` geom with the identity statistic.
+
+```{r}
+stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               y = count),
+           stat = "identity")
+```
+
+#### Boxplots
+
+### Positions
+
+#### Position: Stack
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year)))
+```
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year)),
+           position = "stack")
+```
+
+### Position: Fill
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year)),
+           position = "fill")
+```
+
+### Position: Dodge
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year)),
+           position = "dodge")
+```
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year)),
+           position = position_dodge(preserve = "single"))
+```
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = factor(year))) +
+  geom_text(aes(x = site, label = year, group = year),
+            stat = "count",
+            position = position_stack(vjust = 0.5))
+```
+
+### Position: Jitter
+
+```{r}
+stemdata %>%
+  ggplot() +
+  geom_point(aes(x = site, y = herb_avg),
+             position = position_jitter(width=0.1), alpha = 0.3)
+```
