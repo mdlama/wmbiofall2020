@@ -1,7 +1,7 @@
 ---
-title: "Data Visualization with ggplot2"
-author: "M. Drew LaMar (based on [R for Data Science: Data Transformation](https://r4ds.had.co.nz/transform.html))"
-output: 
+title: "Data Visualization with ggplot2 (Part 1)"
+author: "M. Drew LaMar"
+output:
   learnr::tutorial:
     progressive: true
     allow_skip: true
@@ -102,7 +102,36 @@ As mentioned above, one of the key ideas of _The Grammar of Graphics_ is that vi
 
 We map data to geometric objects through _aesthetics_, which is the focus of the next chapter.
 
-Use later: Processing of data into statistical summaries to show properties of your data, including uncertainty quantification and statistical models.
+Let's first take a look at one of the datasets we will be using for this tutorial.
+
+## The Data
+
+<div style="display: flex;">
+<div style="flex: 1 0 50%;">
+```{r, echo=FALSE, out.width="100%", out.extra="style='display:inline-block'"}
+knitr::include_graphics("images/monarch-milkweed.jpeg")
+```
+<br>Caption: Monarch butterfly on swamp milkweed.<br>JIM HUDGINS / USFWS MIDWEST REGION
+</div>
+<div style="flex: 1 0 50%;">
+```{r, echo=FALSE, out.width="100%", out.extra="style='display:inline-block'"}
+knitr::include_graphics("images/sites.png")
+```
+<br>Caption: Study sites across Virginia for milkweed trait measurements (Mary Seward, W&M)
+</div>
+</div>
+
+The milkweed plant is the sole food source for the monarch butterfly. Milkweed is a long-lived perennial plant that can reproduce sexually and clonally through adventitious root sprouting. Though the belowground root system is perennial, the aboveground ramet population dies back annually. The plot on the right shows sites across Virginia where Professor Dalgleish's lab collected multiple measurements on milkweed over a five year period from 2013-2017. We will use this data over the remainder of this tutorial.
+
+The following describes a subset of the variables in the data that we will explore in this tutorial:
+
+ - `year`: Year at which the data was collected.
+ - `site`: Unique site key denoting where in Virginia the data was collected, including Blandy Experimental Farm (**BLD1**, **BLD2**), Sky Meadows State Park (**SKY**), Presquile Wildlife Refuge (**PWR**), and Yorktown Battlefield Park (**YTB**).
+ - `transect`: Each site had a varying number of transects that were 1 m wide, with variable lengths depending on the size of the milkweed patch.
+ - `plantID`: Unique plant ID.
+ - `h_apical`: Stem height to the apical meristem (cm), measured in June.
+ - `h_apical.next`: Stem height to the apical meristem (cm), measured in September.
+ - `herb_avg`: Herbivory severity score on a modified Daubenmire scale of 0–6 according to percent tissue removed (0 = intact, 1 = 1–5% removed, 2 = 6–24% removed, 3 = 25–50% removed, 4 = 51–75% removed, 5 = 76– 99% removed, 6 = only the petiole remains).
 
 ## Aesthetics and Geoms
 
@@ -201,7 +230,9 @@ ggplot() +
 
 ```{r one-tile-ex-2-hint-3}
 ggplot() +
-  geom_rect(mapping = aes(xmin = 0, ymin = 0, xmax = 2, ymax = 4))
+  geom_rect(mapping = aes(xmin = 0, ymin = 0, xmax = 2, ymax = 4),
+            fill = ___,
+            color = ___)
 ```
 
 ```{r one-tile-ex-2-solution}
@@ -212,10 +243,8 @@ ggplot() +
 ```
 
 ```{r one-tile-ex-2-check}
-gradethis::grade_code()
+gradethis::grade_code("Looks like a super small border size! The default is set to 0.1.")
 ```
-
-Looks like a super small border size! The default is set to 0.1.
 
 ### Multiple geoms: Using layers
 
@@ -224,7 +253,7 @@ Suppose we wanted two rectangles such that:
  (1) Rectangle #1 is the same as above, and
  (2) Rectangle #2 is centered at the upper right corner of Rectangle #1, with all other aesthetics the same except fill is black and the border is blue.
  
-How can we create these? With `ggplot2`, all you have to do is combine two `geom_tile` geom specifications with a `+` sign.
+How can we create these? With `ggplot2`, all you have to do is combine two geom specifications with a `+` sign.
 
 ```{r}
 ggplot() +
@@ -271,12 +300,12 @@ ggplot() +
 gradethis::grade_code()
 ```
 
-Remember the analogy to image processing programs like Photoshop: each geom is a *layer*, and the layers are drawn on top of each other in the order they are specified. What if we still want to see the object behind the other one? Each geom has an *alpha transparency* aesthetic that allows you to _see through_ each layer.
+Remember the analogy to image processing programs like Photoshop: each geom is a *layer*, and the layers are drawn on top of each other in the order they are specified. What if we still want to see the object behind the other one? Each geom has an *alpha transparency* aesthetic, specified between 0 (fully transparent) and 1 (opaque), that allows you to _see through_ each layer.
 
 #### Exercise: Specify transparency
 *Set the value of the red and green rectangle's transparency (or aesthetic* `alpha`*) to 0.6.*
 
-```{r transp-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r transp-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
 ggplot() +
   geom_tile(mapping = aes(x = 10, y = 5), # black and blue rectangle
             width = 20, 
@@ -341,7 +370,7 @@ Nice! What we see is that rather than needing two `geom_tile` commands, we only 
 
 We can now discuss in full generality which aesthetics go in the `aes()` function and get assigned to the `mapping` argument, and which aesthetics go outside the `aes()` function as arguments to the geom.
 
-> Aesthetics that are **mapped from variables** in a data frame or tibble should be set in the `aes()` function and assigned to the `mapping` argument. Aesthetics that are **not mapped from variables**, but are instead meant to be _constant_ across all geom instances, can be assigned as direct arguments to the geom. The only exception to the constant aesthetic rule is when the aesthetic is required - in this case, it needs to be given within the `aes()` function.
+> Aesthetics that are **mapped from variables** in a data frame or tibble should be set in the `aes()` function and assigned to the `mapping` argument. Aesthetics that are **not mapped from variables**, but are instead meant to be _constant_ across all geom instances, can be assigned as direct arguments to the geom. The only exception to the constant aesthetic rule is when the aesthetic is required - in this case, even if it is a constant, a required aesthetic needs to be specified within the `aes()` function.
 
 Why did this example not have varying colors and fills, as the previous examples did? To specify varying colors in the data requires a discussion about **scales**, which we will get to in the next section of this tutorial.
 
@@ -423,7 +452,14 @@ The `geom_rect` and `geom_tile` geoms are examples of *primitive geoms*. Primiti
 #### Exercise: Adding points
 *Starting with the four rectangles from the previous exercise, add points of size 5 at the center of the rectangles.*
 
-```{r adding-points-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r adding-points-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
+tiles <- tribble(
+  ~x, ~y,
+  1, 1,
+  1, -1,
+  -1, -1,
+  -1, 1)
+
 ggplot(data = tiles) +
   geom_tile(mapping = aes(x = x, y = y),
             width = 1,
@@ -493,12 +529,14 @@ gradethis::grade_code()
 ```
 
 #### Exercise: Adding line segments
-*Starting with the data and geoms from the previous two exercises (rectangles and points), add line segments that connect:*
+*Starting with the data and geoms from the previous two exercises (rectangles and points), add line segments of* `size` *1 that connect:*
 
  - *Point (1,1) to point (1,-1)*
  - *Point (1,-1) to point (-1,-1)*
  - *Point (-1,-1) to point (-1,1)*
  - *Point (-1,1) to point (1,1)*
+
+*Start by adding two new variables to the* `tiles` *tibble called* `xend` *and* `yend`.
 
 ```{r adding-lines-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
 tiles <- tribble(
@@ -590,13 +628,13 @@ ggplot(data = tiles,
                size = 1)
 ```
 
-Specify aesthetic mappings in the `ggplot()` function is akin to _setting default aesthetic mappings for all of your geoms to follow_. You can override those defaults for any subsequent geom layer you specify.
+Specifying aesthetic mappings in the `ggplot()` function is akin to _setting default aesthetic mappings for all of your geoms to follow_. If needed, you can override those defaults for any subsequent geom layer you specify.
 
-## Scales, Statistics and Positions
+There are lots of other geoms out there to explore! We will learn about many more of them in Part 2 of this course. First, however, we need to learn about _scales_.
 
-The next two concepts, *scales* and *statistics*, dig a little deeper under the hood of `ggplot2` and detail how your original data is mapped to the visual aesthetics.
+## Scales
 
-### Scales
+The next concept, *scales*, digs a little deeper under the hood of `ggplot2` and details how your original data is mapped to the visual aesthetics.
 
 ```{r, echo=FALSE, out.height="100px",  out.extra="class='float-left'"}
 knitr::include_graphics("images/hex-scales.png")
@@ -627,7 +665,7 @@ knitr::include_graphics("images/scale-guides.png")
 
 Let's go into the two main types of scales individually, starting with _location scales_.
 
-#### Location scales
+### Location scales
 
 Location scales perform the following:
 
@@ -638,7 +676,7 @@ Location scales perform the following:
 
 The most important scale functions for location aesthetics are `scale_x_discrete()`, `scale_x_continuous()`, `scale_y_discrete()`, and `scale_y_continuous()`. The choice of `discrete` or `continuous` should depend, of course, on whether the mapped variable is discrete or continuous.
 
-##### Location scales: Set axes labels
+#### Location scales: Set axes labels
 
 To apply a scale for an aesthetic, you add the scale as if it were a geom with the `+` operator. Note that this is a little inaccurate - you are not adding a scale so much as you are modifying the existing default scale.
 
@@ -697,12 +735,12 @@ tiles <- tribble(
 )
 ```
 
-##### Exercise: Set tick marks
+#### Exercise: Set tick marks
 *Starting with the previous plot, change the tick marks by setting the* `breaks` *argument for each of the* `x` *and* `y` *scales. Create ticks that go from -1.5 to 1.5 in increments of 0.5. Hint: Use the* `seq` *function for the tick marks!*
 
 > The `breaks` argument is a numeric vector of positions.
 
-```{r tick-marks-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+```{r tick-marks-ex-1, exercise=TRUE, exercise.setup="tiles-setup", exercise.eval = TRUE}
 ggplot(data = tiles,
        mapping = aes(x = x, y = y)) +
   geom_tile(width = 1,
@@ -738,12 +776,12 @@ ggplot(data = tiles,
 gradethis::grade_code()
 ```
 
-##### Exercise: Set tick marks and labels
+#### Exercise: Set tick marks and labels
 *Replicate the tick marks and labels for the following plot. Use the scale argument* `labels` *to set the labels as seen below.*
 
 > The `labels` argument is a character vector giving labels (must be same length as `breaks`).
 
-```{r, echo=FALSE, fig.width=4}
+```{r, echo=FALSE, fig.width=4, fig.align="center"}
 ggplot(data = tiles,
        mapping = aes(x = x, y = y)) +
   geom_tile(width = 1,
@@ -762,7 +800,7 @@ ggplot(data = tiles,
                      labels = c("C", "D"))
 ```
 
-```{r scale-labels-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+```{r scale-labels-ex-1, exercise=TRUE, exercise.setup="tiles-setup", exercise.eval = TRUE}
 ggplot(data = tiles,
        mapping = aes(x = x, y = y)) +
   geom_tile(width = 1,
@@ -819,12 +857,12 @@ gradethis::grade_code()
 
 See ["Position scales and axes"](https://ggplot2-book.org/scale-position.html) for more advanced specifications.
 
-##### Exercise: Adjust axes limits
+#### Exercise: Adjust axes limits
 *We can also modify a location aesthetic scale to change the limits of the axis by using the* `limits` *argument. Starting with the plot below, constrain the x axis so that* $0 \leq x \leq 2$*.*
 
 > The `limits` argument is a numeric vector of length two providing limits of the scale. Use NA to refer to the existing minimum or maximum.
 
-```{r limits-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+```{r limits-ex-1, exercise=TRUE, exercise.setup="tiles-setup", , exercise.eval = TRUE}
 ggplot(data = tiles,
        mapping = aes(x = x, y = y)) +
   geom_tile(width = 1,
@@ -855,16 +893,16 @@ ggplot(data = tiles,
 gradethis::grade_code()
 ```
 
-What, what?? What happened to our horizontal lines?! Setting the limits using the scale functions by default is different than just zooming in. By default, `ggplot2` will set the values of any data outside the limits to NA. Thus, the horizontal lines in this example will have one endpoint set to NA, and therefore _will not be drawn_. Thus, the default behavior in ggplot2 is to zoom **and** clip. 
+What, what?? What happened to our horizontal lines?! Setting the limits using the scale functions is different than just zooming in. By default, `ggplot2` will set the values of any data outside the limits to NA. Thus, the horizontal lines in this example will have one endpoint set to NA, and therefore _will not be drawn_. Thus, the default behavior in ggplot2 is to zoom **and** clip. 
 
 What if you want to keep the values that are "out of bounds" (i.e. no clipping)? There is an argument to the scales function called `oob` that specifies this. By default, the argument is `oob = scales::oob_censor` which, as we stated previously, sets out of bound values to NA. This notation says _"use the_ `oob_censor()` _function in the_ `scales` _package to handle data that is out of bounds."_ 
 
 [This reference sheet](https://scales.r-lib.org/reference/oob.html) lists all of the options for handling out of bound data. Probably the most important other `oob` function is `scales::oob_keep`, which will keep the data, thereby performing a more standard zoom.
 
-##### Exercise: No clipping!
+#### Exercise: No clipping!
 *Change the default out-of-bound behavior by setting the* `oob` *argument for the* `x` *scale to* `scales::oob_keep`*.*
 
-```{r oob-ex-1, exercise=TRUE, exercise.setup="tiles-setup"}
+```{r oob-ex-1, exercise=TRUE, exercise.setup="tiles-setup", , exercise.eval = TRUE}
 ggplot(data = tiles,
        mapping = aes(x = x, y = y)) +
   geom_tile(width = 1,
@@ -897,13 +935,13 @@ ggplot(data = tiles,
 gradethis::grade_code()
 ```
 
-That's better! But wait - why is _clip_ (`oob_censor`) and not _zoom_ (`oob_keep()`) the default behavior? Clipping will make more sense when we discuss statistics later in this tutorial.
+That's better! But wait - why is _zoom and clip_ (`oob_censor`) and not just _zoom_ (`oob_keep()`) the default behavior? Clipping will make more sense when we discuss statistics in Part 2 of this tutorial.
 
-##### Location scales: Axis transformations
+### Location scales: Axis transformations
 
-Besides setting axes labels, tick marks, and clipping/zooming windows, scales can also explicitly define the transformation from your data to the aesthetic (axis). By default, location scales do NOT perform a transformation, i.e. they perform an identity mapping between your data and the axes. There are times, however, when you will want to change this. We will cover one of the more common transformations - log transformations.
+Besides setting axes labels, tick marks, and clipping/zooming, scales can also explicitly define the transformation from your data to the aesthetic (axis). By default, location scales do NOT perform a transformation, i.e. they perform an identity mapping between your data and the axes. There are times, however, when you will want to change this. We will cover one of the more common transformations - log transformations.
 
-To illustrate transformations, let's revisit the milkweed data. The following creates a scatter plot of herbivory average versus apical stem height in June (cm). For simplicity, we first filter out where herbivory average is 0.
+To illustrate transformations, let's revisit the milkweed data. The following creates a scatter plot of herbivory average versus apical stem height in June (cm). For simplicity, we first filter out where herbivory average is 0. In the code below, note that we can pipe the filtered data into the `ggplot()` function since the `data` argument is the first argument. We also do not explicitly specify the `mapping` argument in `geom_point` since it too is the first argument of all geoms.
 
 ```{r stemdata-scatter}
 stemdata %>%
@@ -928,7 +966,7 @@ Note that the y axis label and values of the tick marks on the vertical axis are
 
 > Rather than transforming the data, scale transformations are best thought of as nonlinear zooming along the relevant axis. 
  
-It appears that 0-0.3 was _stretched_, whereas 0.3-6 was _squished_, and that the rate of stretching and squishing varies across the axis (proportional to the derivative of the scaling function at each point).
+It appears that 0-0.3 was _stretched_, whereas 0.3-6 was _squished_, and that the rate of stretching and squishing varies across the axis (proportional to the derivative of the transformation function at each point).
 
 To illustrate the difference between transforming the data and transforming the axis, let's perform the same plot but calculate ourselves the log (base 10) of herbivory average.
 
@@ -941,11 +979,35 @@ stemdata %>%
                  y = log_herb_avg))
 ```
 
-You'll notice that (1) the label is now `log_herb_avg`, and (2) the minimum is around -1.5 in this plot, which corresponds to $10^{-1.5} \approx 0.03$ on the previous plot. Thus, the vertical axis is now showing the exponents, which while accurately depicting the log scale can be harder to interpret.
+The points look the same, but you may notice that (1) the label is now `log_herb_avg`, and (2) the minimum is around -1.5 in this plot, which corresponds to $10^{-1.5} \approx 0.03$ on the previous plot. Thus, the vertical axis is now showing the exponents, which while accurately depicting the log scale can be harder to interpret.
 
-###### Exercise: 
+Check out [Section 14.2: Scale transformation](https://ggplot2-book.org/scales-guides.html#scale-transformation) in _ggplot2: Elegant Graphics for Data Analysis_ for a list of common transformations.
 
-#### Color scales
+#### Exercise: Can you spare a square root?
+*Starting with the plot below and referring to Section 14.2 of the above link, use a square root mapping of herbivory average to the y aesthetic.*
+
+```{r spare-square-root-ex-1, exercise=TRUE, exercise.setup="stemdata-setup", exercise.eval=TRUE}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot() +
+  geom_point(aes(x = h_apical,
+                 y = herb_avg))
+```
+
+```{r spare-square-root-ex-1-solution}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot() +
+  geom_point(aes(x = h_apical,
+                 y = herb_avg)) +
+  scale_y_continuous(trans = "sqrt")
+```
+
+```{r spare-square-root-ex-1-check}
+gradethis::grade_code("Not bad. For some data, square roots perform better than logs when you want to stretch values near zero (not in this case, though!).")
+```
+
+### Color scales
 
 Besides location aesthetics, the most commonly used aesthetic is based on color (via `color` or `fill`).
 
@@ -957,27 +1019,32 @@ Color scales perform many of the same actions as location scales:
  - **Adjust key limits**
  - **Key transformations**
 
+Here's the picture of a scatter plot with x, y, and a discrete color scale from before (for reference):
+```{r, echo=FALSE, out.width="400px", out.extra="class='center'"}
+knitr::include_graphics("images/scale-guides.png")
+```
+
 There are many different palettes available in `ggplot2`, each of which depends strongly on whether the data mapping to the aesthetic is discrete or continuous. The following table summarizes the main ggplot2 color scales:
 
 | Palette | Discrete | Continuous | Resources |
 | :------ | :------- | :--------- | :-------- |
-| [HCL](https://ggplot2.tidyverse.org/reference/scale_hue.html) (_default_)| `scale_*_hue` | - | [More info...](http://hclwizard.org/) |
-| [Viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html) | `scale_*_viridis_d` | `scale_*_viridis_c` | [More info...](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) |
-| [ColorBrewer](https://ggplot2.tidyverse.org/reference/scale_brewer.html) | `scale_*_brewer` | `scale_*_distiller` | [More info...](https://colorbrewer2.org) |
-| [Gradient](https://ggplot2.tidyverse.org/reference/scale_gradient.html) | - | `scale_*_gradient` | [More info...](https://scales.r-lib.org//reference/seq_gradient_pal.html) |
+| [HCL](https://ggplot2.tidyverse.org/reference/scale_hue.html) | `scale_*_hue` | - | [More info](http://hclwizard.org/) |
+| [Viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html) | `scale_*_viridis_d` | `scale_*_viridis_c` | [More info](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) |
+| [ColorBrewer](https://ggplot2.tidyverse.org/reference/scale_brewer.html) | `scale_*_brewer` | `scale_*_distiller` | [More info](https://colorbrewer2.org) |
+| [Gradient](https://ggplot2.tidyverse.org/reference/scale_gradient.html) | - | `scale_*_gradient` | [More info](https://scales.r-lib.org//reference/seq_gradient_pal.html) |
 
-##### Color scales: Define palettes
+#### Color scales: Define palettes
 
 While location scales by default map data directly to their respective axes with no changes (i.e. they perform an identity mapping), this is not so for color. This is because there is no inherent natural way to map a continuous or discrete variable to a color scale. Which scale do we use? There are infinitely many of them!
 
-By default, `ggplot2` maps to the [HCL color scale](http://hclwizard.org/#hcl-color-space) (H = Hue, C = Chroma, L = Luminance), which is a color scale that apparently maps well to human color perception.
+By default, for discrete scales `ggplot2` maps to the [HCL color scale](http://hclwizard.org/#hcl-color-space) (H = Hue, C = Chroma, L = Luminance), which is a color scale that apparently maps well to human color perception.
 
 Let's revisit our four rectangles to illustrate this. This time, though, we will allow the fill color for each rectangle to vary, and thus will include the fill as a variable in the `tiles` dataset.
 
-###### Exercise: Mapping color
+##### Exercise: Mapping color
 *Run the following code and then modify it by assigning the* `fill` *variable in the* `tiles` *data to the* `fill` *aesthetic.*
 
-```{r mapping-color-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r mapping-color-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
 tiles <- tribble(
   ~x, ~y, ~fill,
   1, 1, "forestgreen",
@@ -1023,12 +1090,10 @@ ggplot(data = tiles) +
 ```
 
 ```{r mapping-color-ex-1-check}
-gradethis::grade_code()
+gradethis::grade_code("Huh? That's not right at all! What are those colors? Impostors!!")
 ```
 
-Huh? That's not right at all! What are those colors? Impostors!! 
-
-Okay, well, they're not so bad - they are two equally distant (in hue) colors in HCL color space and represent ggplot2's default color palette. You can see these colors by using functions from the `scales` package as follows:
+Okay, well, they're not so bad - they are two equally distant (in hue) colors in HCL color space and represent ggplot2's default discrete color palette. You can see these colors by using functions from the `scales` package as follows:
 
 ```{r}
 scales::show_col(
@@ -1038,9 +1103,9 @@ scales::show_col(
 
 It looks like "forestgreen" is mapped to "#F8766D" and "goldenrod1" is mapped to "#00BFC4". These hash-tag numbers are called hexidecimal numbers and are often used to specify color on websites (see the [color-hex website](https://www.color-hex.com/) for more information - and fun! It's like being in a paint store...). 
 
-So how do we get the colors that are directly listed in the data? After all, our current `tiles` data is already representing aesthetic data. One way is to tell `ggplot2` that we want it to behave more like a location scale and use an identity mapping, which we can do by specifying the `scale_fill_identity()` function.
+So how do we get the colors that are directly listed in the data? After all, our current `tiles` data is already directly representing aesthetic data. One way is to tell `ggplot2` that we want it to behave more like a location scale and use an identity mapping, which we can do by specifying the `scale_fill_identity()` function.
 
-###### Exercise: Identity color scale
+##### Exercise: Identity color scale
 *Starting with the plot below, add the* `scale_fill_identity()` *function at the end.*
 
 ```{r scale-fill-identity-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
@@ -1075,10 +1140,10 @@ ggplot(data = tiles) +
 ```
 
 ```{r scale-fill-identity-ex-1-check}
-gradethis::grade_code()
+gradethis::grade_code("That was easy!")
 ```
 
-That was easy! Basically, `scale_fill_identity()` tells `ggplot2` that the data already specifies the desired aesthetic values. However, most of the time our categorical data doesn't store actual color names. For example, suppose our data looked more like this:
+Basically, `scale_fill_identity()` tells `ggplot2` that the data already specifies the desired aesthetic values. However, most of the time our categorical data doesn't store actual color names. For example, suppose our data looked more like this:
 
 ```{r}
 tiles <- tribble(
@@ -1091,14 +1156,14 @@ tiles <- tribble(
 
 In this case, we can't use `scale_fill_identity()` since the levels of the `royalty` variable aren't color names. This is where the `scale_fill_manual()` comes into play, where you can specify how to map the levels of the discrete `royalty` variable to colors (i.e. _we_ get to specify the mapping of data to aesthetics).
 
-###### Exercise: Manual color mapping
+##### Exercise: Manual color mapping
 *Starting with the updated data below, add the* `scale_fill_manual()` *function and set the argument* `values` *equal to a named vector such that* `william` *gets mapped to* `forestgreen` *and* `mary` *gets mapped to* `goldenrod1`.
 
 *Here is the definition of the* `values` *argument from the ggplot2 reference.*
 
 > In `scale_*_manual()`, the argument `values` is a set of aesthetic values to map data values to. The values will be matched in order (usually alphabetical) with the limits of the scale, or with breaks if provided. If this is a named vector, then the values will be matched based on the names instead.
 
-```{r scale-manual-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r scale-manual-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
 tiles <- tribble(
   ~x, ~y, ~royalty,
   1, 1, "william",
@@ -1153,9 +1218,58 @@ gradethis::grade_code()
 
 Note that we get a legend this time telling us how the fill aesthetic colors map back to the original data.
 
-##### Color scales: Set legend titles, keys, and key labels
+The following two definitions define the `name` and `labels` argument for color scales:
 
-```{r}
+> The `name` argument gives the name of the scale. It is used as the legend title.
+
+> The `labels` argument is a character vector giving key labels (must be same length as `breaks`). The labels will be matched in order (usually alphabetical) with the breaks of the scale. If this is a named vector, then the labels will be matched based on the names instead.
+
+##### Exercise: Set legend titles and key labels
+*Starting with the plot below, set the legend title to* `Royalty` *and the key labels* `King William` *for* `william` *and* `Queen Mary` *for* `mary`.
+
+```{r color-legend-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"))
+```
+
+```{r color-legend-ex-1-hint-1}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = ___)
+```
+
+```{r color-legend-ex-1-hint-2}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
 ggplot(data = tiles) +
   geom_tile(mapping = aes(x = x, y = y, fill = royalty),
             width = 1,
@@ -1164,13 +1278,64 @@ ggplot(data = tiles) +
   scale_fill_manual(values = c("william" = "forestgreen", 
                                "mary" = "goldenrod1"),
                     name = "Royalty",
-                    labels = c("william" = "King William", "mary" = "Queen Mary"),
-                    limits = c("william", "mary"))
+                    labels = c("william" = ___, "mary" = ___))
 ```
 
-##### Color scales: Adjust key limits
+```{r color-legend-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
 
-```{r}
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"))
+```
+
+```{r color-legend-ex-1-check}
+gradethis::grade_code()
+```
+
+Just as with location scales, we can set limits with the `limits` argument. Since `royalty` is a discrete variable in this case, rather than specifying the limits using a lower and upper bound, we can just specify the limits as a subset of the levels of the `royalty` variable.
+
+##### Exercise: Adjust key limits
+*Starting with the plot below, set the* `limits` *argument so that only the "Queen Mary" rectangles show.*
+
+```{r key-limits-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval = TRUE}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"))
+```
+
+```{r key-limits-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
 ggplot(data = tiles) +
   geom_tile(mapping = aes(x = x, y = y, fill = royalty),
             width = 1,
@@ -1183,42 +1348,139 @@ ggplot(data = tiles) +
                     limits = c("mary"))
 ```
 
-##### Color scales: Transformations
+```{r key-limits-ex-1-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Reorder keys
+*Have you noticed how the keys are ordered? Looks like it's alphabetical. One nice use of* `limits` *is to reorder the legend keys. Starting with the plot below, set the* `limits` *argument so that "King William" comes before "Queen Mary" in the legend.*
+
+```{r reorder-keys-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"))
+```
+
+```{r reorder-keys-ex-1-solution}
+tiles <- tribble(
+  ~x, ~y, ~royalty,
+  1, 1, "william",
+  1, -1, "mary",
+  -1, -1, "william",
+  -1, 1, "mary")
+
+ggplot(data = tiles) +
+  geom_tile(mapping = aes(x = x, y = y, fill = royalty),
+            width = 1,
+            height = 1,
+            size = 2) +
+  scale_fill_manual(values = c("william" = "forestgreen", 
+                               "mary" = "goldenrod1"),
+                    name = "Royalty",
+                    labels = c("william" = "King William", "mary" = "Queen Mary"),
+                    limits = c("william", "mary"))
+```
+
+```{r reorder-keys-ex-1-check}
+gradethis::grade_code()
+```
+
+#### Color scales: Transformations
+
+All of the previous color scale examples covered _discrete scales_ and manual palettes. Let's explore some continuous color scales. This section will be expository only - no exercises! So just sit back and enjoy.
+
+Getting back to the milkweed data (feel free to refresh your memory by visiting "The Data" section above), we will start by looking at a scatter plot of apical stem height in September versus apical stem height in June. Note again how we are suppressing the `data` and `mapping` argument names - they are implied since they are the first arguments of their respective functions.
 
 ```{r}
 ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next), 
+             alpha = 0.5) +
+  scale_y_continuous(limits = c(0, 200))
+```
+
+This is a useful plot to illustrate stem growth over the June to September time period. We are using alpha transparency to help a little with the over-plotting occurring with the points. Also, we've clipped the vertical axis to heights in September below 200 cm due to a couple of outliers (probably a data entry error!).
+
+One interesting additional dimension that might be interesting to add to the plot is herbivory average. How do we add a third dimension? Well, since we're talking about color, why not try color! Since herbivory average is continuous, let's start with the viridis color palette (`scale_color_viridis_c()`).
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
   scale_color_viridis_c() + 
   scale_y_continuous(limits = c(0, 200))
 ```
 
+Hmmm, it seems like there is A LOT of purple corresponding to near zero herbivory averages, based on the _colorbar_ in the legend. This is a situation where it might be useful to map a log transformation of herbivory average to the colorbar, similar to what we did when hervivory average was mapped to a location aesthetic. Let's try the `trans` argument that we used previously, but now use it with the color scale.
+
 ```{r}
 ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
   scale_color_viridis_c(trans = "log10") + 
   scale_y_continuous(limits = c(0, 200))
 ```
 
-```{r}
-ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
-  scale_color_viridis_c(trans = "log10", na.value = "red") + 
-  scale_y_continuous(limits = c(0, 200))
-```
+Ah, that's better! So it looks like the colorbar didn't really change but the colorbar key/ticks did change, as well as where those tick values mapped to on the colorbar. Again, it looks like a lot of the herbivory average values where _stretched_ across the colorbar, _squishing_ the larger values towards 6 (the maximum). This allows us to see better the differences in herbivory averages - the yellows stand at more, and the smaller variations near zero are more clearly visible.
+
+Note that since we had quite a few plants that had no herbivory, when we did a log transform, we got -Inf, which gets mapped to NA since they are out of bounds of the colorbar. Where are those plants? If you look carefully, you'll notice there are a lot of points that are grey. Scales have an argument called `na.value` that you can set to a color aesthetic in order to see which plants those correspond to (or to change the default grey color, which is hard to see).
 
 ```{r}
 ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
-  scale_color_viridis_c(trans = "log10", na.value = NA) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", 
+                        na.value = "red") + 
   scale_y_continuous(limits = c(0, 200))
 ```
 
+Whoa, there they are! Okay, well there appear to be too many of them - they are blocking the other points! Is there a way to remove them _without_ pre-filtering the data prior to visualization? Yes! You can set the value of `na.value` to NA. This will remove these "out of bounds" points from the plot.
+
 ```{r}
 ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, y = h_apical.next, color = herb_avg), alpha = 0.5) + 
-  scale_color_viridis_c(trans = "log10", na.value = NA, direction = -1) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", 
+                        na.value = NA) + 
   scale_y_continuous(limits = c(0, 200))
 ```
+
+Ah, even better. Hmm, since there are a lot more purple points then yellow points, maybe we should reverse the order of the colorbar - it might be easier to see fewer darker purple points against a larger array of lighter yellow points. There is an argument to color scales called `direction` that allows us to, you know, reverse the direction of the colorbar. Setting it to -1 will do the trick.
+
+```{r}
+ggplot(stemdata) + 
+  geom_point(aes(x = h_apical, 
+                 y = h_apical.next, 
+                 color = herb_avg), 
+             alpha = 0.5) + 
+  scale_color_viridis_c(trans = "log10", 
+                        na.value = NA, 
+                        direction = -1) + 
+  scale_y_continuous(limits = c(0, 200))
+```
+
+Nice! Okay, let's play with a new palette. This one is called `gradient2` which is good for creating _diverging palettes_ for situations when you want to really separate out high from low values. Let's embrace our inner Griffin while we're at it.
 
 ```{r}
 ggplot(stemdata) + 
@@ -1234,35 +1496,9 @@ ggplot(stemdata) +
   scale_y_continuous(limits = c(0, 200))
 ```
 
-```{r}
-ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, 
-                 y = h_apical.next, 
-                 color = herb_avg), 
-             alpha = 0.5) + 
-  scale_color_gradient2(low = "forestgreen", 
-                        mid = "white", 
-                        high = "goldenrod1", 
-                        midpoint = 3,
-                        na.value = "forestgreen") + 
-  scale_y_continuous(limits = c(0, 200)) +
-  theme_dark()
-```
+Note that I've chosen the midpoint to be in the middle of the herbivory scale (3), and I've mapped the out-of-bound values (zero herbivory plants) to the lower bound aesthetic (forestgreen).
 
-```{r}
-ggplot(stemdata) + 
-  geom_point(aes(x = h_apical, 
-                 y = h_apical.next, 
-                 color = herb_avg), 
-             alpha = 0.5) + 
-  scale_color_gradient2(low = "forestgreen", 
-                        mid = "white", 
-                        high = "goldenrod1", 
-                        midpoint = mean(stemdata$herb_avg, na.rm = TRUE),
-                        na.value = "forestgreen") + 
-  scale_y_continuous(limits = c(0, 200)) +
-  theme_dark()
-```
+Let's try that log transformation again for this scale. This time, we'll set the midpoint to the log (base 10) of the mean herbivory average.
 
 ```{r}
 ggplot(stemdata) + 
@@ -1276,9 +1512,10 @@ ggplot(stemdata) +
                         midpoint = log10(mean(stemdata$herb_avg, na.rm = TRUE)),
                         na.value = "forestgreen",
                         trans = "log10") + 
-  scale_y_continuous(limits = c(0, 200)) +
-  theme_dark()
+  scale_y_continuous(limits = c(0, 200))
 ```
+
+Better! Let's do one more thing. There is a shape aesthetic that we haven't talked about yet. Most point shapes only have a color aesthetic, but a select few have a color and fill aesthetic. Shape 21 is one of those that has both and is the same shape as the default (shape 19) - a circle! Let's set the shape of the points to 21 (a constant) and map herbivory average to fill instead of color (the default color is black).
 
 ```{r}
 ggplot(stemdata) + 
@@ -1297,221 +1534,21 @@ ggplot(stemdata) +
   theme_dark()
 ```
 
-### Statistics
+Pretty cool! This makes it much easier to see variations between herbivory and how it might relate to plant size and growth.
 
-So far we've created some _primitive geoms_ using `ggplot2`. With primitive geoms, there is no additional data processing that occurs between your data and what gets mapped to aesthetics in the plot (except any transformations from the scales). However, almost all plots and graphs of interest involve computing some statistical summaries of interest and then displaying those statistical summaries using multiple primitive geoms. Thus begins our foray into `ggplot2`'s use of **statistics**, or `stat`s in ggplot2 lingo.
+### Congratulations! You have finished "Data Visualization with ggplot2 (Part 1)"!
 
-#### Bar plots
+Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
 
-Let's start by creating a bar plot. We create a bar plot when
-
- - the explanatory variable is categorical, and
- - we want to display a statistical summary which is numerical.
-
-Using multiple techniques, we are going to create the following bar plot showing the number of plants in each site.
-```{r, echo=FALSE, fig.align="center"}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site))
+```{r ui, echo=FALSE}
+textInput("name", "Your name")
+verbatimTextOutput("turnin")
 ```
 
-The most common case for a bar plot is when we have one categorical variable and we want to count the number of occurrences of each category in the data. In order to do this, we create a contingency table consisting of the categories (or levels) of the variable and the counts of each level in the data.
-
-<<SHOW PICTURE OF DATA -> CONTINGENCY TABLE>>
-
-Once this is complete, we then create rectangles for each category with a minimum y-value at 0 and a maximum y-value at the number of occurrences for that category. We usually also make the bar widths such that they do not touch (to signify visually that the variable is categorical).
-
-##### Exercise: Create a contingency table using `dplyr`
-```{r contingency-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
-plotdata <- stemdata %>%
-  group_by(___) %>%
-  summarize(___)
-```
-
-```{r contingency-ex-1-solution}
-plotdata <- stemdata %>%
-  group_by(site) %>%
-  summarize(count = n())
-```
-
-```{r contingency-ex-1-check}
-gradethis::grade_code()
-```
-
-##### Exercise: Create aesthetics
-
-```{r contingency-ex-2-setup, include=FALSE}
-library(tidyverse)
-stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
-plotdata <- stemdata %>%
-  group_by(site) %>%
-  summarize(count = n())
-```
-
-```{r contingency-ex-2, exercise=TRUE, exercise.setup="contingency-ex-2-setup"}
-plotdata <- plotdata %>%
-  mutate(xmin = 0.55 + 0:4,
-         xmax = 1.45 + 0:4,
-         ymin = 0,
-         ymax = count)
-```
-
-```{r contingency-ex-2-solution}
-plotdata <- plotdata %>%
-  mutate(xmin = 0.55 + 0:4,
-         xmax = 1.45 + 0:4,
-         ymin = 0,
-         ymax = count)
-```
-
-```{r contingency-ex-2-check}
-gradethis::grade_code()
-```
-
-##### Exercise: Map to `geom_rect` geoms
-
-```{r contingency-ex-3-setup, include=FALSE}
-library(tidyverse)
-stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
-plotdata <- stemdata %>%
-  group_by(site) %>%
-  summarize(count = n()) %>%
-  mutate(xmin = 0.55 + 0:4,
-         xmax = 1.45 + 0:4,
-         ymin = 0,
-         ymax = count)
-```
-
-```{r contingency-ex-3, exercise=TRUE, exercise.setup="contingency-ex-3-setup", fig.align="center"}
-ggplot(data = plotdata) +
-  geom_rect(aes(___))
-```
-
-```{r contingency-ex-3-solution}
-ggplot(data = plotdata) +
-  geom_rect(aes(
-    xmin = xmin,
-    xmax = xmax,
-    ymin = ymin,
-    ymax = ymax))
-```
-
-```{r contingency-ex-3-check}
-gradethis::grade_code()
-```
-
-All in one pipeline:
-```{r, fig.align="center"}
-stemdata %>%
-  group_by(site) %>%
-  summarize(count = n()) %>%
-  mutate(xmin = 0.55 + 0:4,
-         xmax = 1.45 + 0:4,
-         ymin = 0,
-         ymax = count) %>%
-  ggplot() +
-  geom_rect(aes(
-    xmin = xmin,
-    xmax = xmax,
-    ymin = ymin,
-    ymax = ymax)
-  )
-```
-
-What about tick labels? Axes labels? We'll learn about setting those later. Before we go there, let's look at our first complex geom `geom_bar` that automates a lot of this process. Here's the command in `ggplot2` using the `geom_bar` geom that performs this data processing and aesthetic mappings free of charge:
-```{r}
-ggplot(data = stemdata) +
-  geom_bar(aes(x = site))
-```
-
-The `geom_bar` geom performs a lot of things in this example:
-
- 1. Use the statistic `stat_count()` to compute the contingency table of the number of plants in each site.
- 2. Create default values for the `xmin`, `xmax`, `ymin`, and `ymax` based on parameters for the bars and the counts from the contingency table.
- 3. Plot the results using `geom_rect` geoms and assign tick labels and axes labels automatically based on the raw and calculated data from the statistic.
-
-```{r, echo=FALSE, out.width="95%", out.extra="class='center'", fig.cap="Figure 1. (1) Count all plants within each site using the `count` statistic, (2) compute aesthetics for the bars (xmin, xmax, ymin, ymax), and (3) map those aesthetics to the coordinate plane (in this case using `geom_rect` primitive)."}
-knitr::include_graphics("images/statistics.png")
-```
-
-As mentioned above, by default, `geom_bar` uses the `count` statistic. You can manually specify the statistic by specifying the `stat` argument as a string to the geom. Also note that, by default, `geom_bar` maps the computed `count` statistic to the `y` aesthetic. The following command is fully explicit but performs the same action as above.
-```{r}
-ggplot(data = stemdata) +
-  geom_bar(aes(x = site,
-               y = after_stat(count)),
-           stat = "count")
-```
-
-Another very important statistic is the "identity" statistic, which effectively skips the statistic step and goes straight to the aesthetic mapping step. One possible use of this is if we want a bar plot _but we already have the heights of the bars_. So, for example, we could create the bar plot above by first counting the plants in each site ourselves (i.e. doing the count statistic manually) and then pass that processed data to the `geom_bar` geom with the identity statistic.
-
-```{r}
-stemdata %>%
-  group_by(site) %>%
-  summarize(count = n()) %>%
-  ggplot() +
-  geom_bar(aes(x = site,
-               y = count),
-           stat = "identity")
-```
-
-#### Boxplots
-
-### Positions
-
-#### Position: Stack
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year)))
-```
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year)),
-           position = "stack")
-```
-
-### Position: Fill
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year)),
-           position = "fill")
-```
-
-### Position: Dodge
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year)),
-           position = "dodge")
-```
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year)),
-           position = position_dodge(preserve = "single"))
-```
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_bar(aes(x = site, fill = factor(year))) +
-  geom_text(aes(x = site, label = year, group = year),
-            stat = "count",
-            position = position_stack(vjust = 0.5))
-```
-
-### Position: Jitter
-
-```{r}
-stemdata %>%
-  ggplot() +
-  geom_point(aes(x = site, y = herb_avg),
-             position = position_jitter(width=0.1), alpha = 0.3)
+```{r server, context="server"}
+output$turnin <- renderText({
+  stamp <- paste("Finished Data Visualization with ggplot2 - Part 1:", Sys.time(), input$name)
+  paste0(stamp, "\n",
+         digest::digest(stamp, "md5", serialize=FALSE))
+})
 ```
