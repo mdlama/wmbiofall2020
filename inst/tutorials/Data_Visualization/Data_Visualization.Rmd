@@ -30,10 +30,12 @@ library(digest)
 
 ```{r tidyverse-setup, include=FALSE}
 library(tidyverse)
+library(xkcd)
 ```
 
 ```{r stemdata-setup, include=FALSE}
 library(tidyverse)
+library(xkcd)
 stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
 ```
 
@@ -109,7 +111,7 @@ Let's first take a look at one of the datasets we will be using for this tutoria
 <div style="display: flex;">
 <div style="flex: 1 0 50%;">
 ```{r, echo=FALSE, out.width="100%", out.extra="style='display:inline-block'"}
-knitr::include_graphics("images/monarch-milkweed.jpeg")
+knitr::include_graphics("images/monarch-milkweed.jpg")
 ```
 <br>Caption: Monarch butterfly on swamp milkweed.<br>JIM HUDGINS / USFWS MIDWEST REGION
 </div>
@@ -632,9 +634,11 @@ Specifying aesthetic mappings in the `ggplot()` function is akin to _setting def
 
 There are lots of other geoms out there to explore! We will learn about many more of them in Part 2 of this course. First, however, we need to learn about _scales_.
 
-## Scales
+## Scales and Statistics
 
-The next concept, *scales*, digs a little deeper under the hood of `ggplot2` and details how your original data is mapped to the visual aesthetics.
+The next two concepts, *scales* and *statistics*, dig a little deeper under the hood of `ggplot2` and detail how your original data is mapped to the visual aesthetics.
+
+### Scales
 
 ```{r, echo=FALSE, out.height="100px",  out.extra="class='float-left'"}
 knitr::include_graphics("images/hex-scales.png")
@@ -665,7 +669,7 @@ knitr::include_graphics("images/scale-guides.png")
 
 Let's go into the two main types of scales individually, starting with _location scales_.
 
-### Location scales
+#### Location scales
 
 Location scales perform the following:
 
@@ -676,7 +680,7 @@ Location scales perform the following:
 
 The most important scale functions for location aesthetics are `scale_x_discrete()`, `scale_x_continuous()`, `scale_y_discrete()`, and `scale_y_continuous()`. The choice of `discrete` or `continuous` should depend, of course, on whether the mapped variable is discrete or continuous.
 
-#### Location scales: Set axes labels
+##### Location scales: Set axes labels
 
 To apply a scale for an aesthetic, you add the scale as if it were a geom with the `+` operator. Note that this is a little inaccurate - you are not adding a scale so much as you are modifying the existing default scale.
 
@@ -735,7 +739,7 @@ tiles <- tribble(
 )
 ```
 
-#### Exercise: Set tick marks
+##### Exercise: Set tick marks
 *Starting with the previous plot, change the tick marks by setting the* `breaks` *argument for each of the* `x` *and* `y` *scales. Create ticks that go from -1.5 to 1.5 in increments of 0.5. Hint: Use the* `seq` *function for the tick marks!*
 
 > The `breaks` argument is a numeric vector of positions.
@@ -776,7 +780,7 @@ ggplot(data = tiles,
 gradethis::grade_code()
 ```
 
-#### Exercise: Set tick marks and labels
+##### Exercise: Set tick marks and labels
 *Replicate the tick marks and labels for the following plot. Use the scale argument* `labels` *to set the labels as seen below.*
 
 > The `labels` argument is a character vector giving labels (must be same length as `breaks`).
@@ -857,7 +861,7 @@ gradethis::grade_code()
 
 See ["Position scales and axes"](https://ggplot2-book.org/scale-position.html) for more advanced specifications.
 
-#### Exercise: Adjust axes limits
+##### Exercise: Adjust axes limits
 *We can also modify a location aesthetic scale to change the limits of the axis by using the* `limits` *argument. Starting with the plot below, constrain the x axis so that* $0 \leq x \leq 2$*.*
 
 > The `limits` argument is a numeric vector of length two providing limits of the scale. Use NA to refer to the existing minimum or maximum.
@@ -937,7 +941,7 @@ gradethis::grade_code()
 
 That's better! But wait - why is _zoom and clip_ (`oob_censor`) and not just _zoom_ (`oob_keep()`) the default behavior? Clipping will make more sense when we discuss statistics in Part 2 of this tutorial.
 
-### Location scales: Axis transformations
+#### Location scales: Axis transformations
 
 Besides setting axes labels, tick marks, and clipping/zooming, scales can also explicitly define the transformation from your data to the aesthetic (axis). By default, location scales do NOT perform a transformation, i.e. they perform an identity mapping between your data and the axes. There are times, however, when you will want to change this. We will cover one of the more common transformations - log transformations.
 
@@ -983,7 +987,7 @@ The points look the same, but you may notice that (1) the label is now `log_herb
 
 Check out [Section 14.2: Scale transformation](https://ggplot2-book.org/scales-guides.html#scale-transformation) in _ggplot2: Elegant Graphics for Data Analysis_ for a list of common transformations.
 
-#### Exercise: Can you spare a square root?
+##### Exercise: Can you spare a square root?
 *Starting with the plot below and referring to Section 14.2 of the above link, use a square root mapping of herbivory average to the y aesthetic.*
 
 ```{r spare-square-root-ex-1, exercise=TRUE, exercise.setup="stemdata-setup", exercise.eval=TRUE}
@@ -1007,7 +1011,7 @@ stemdata %>%
 gradethis::grade_code("Not bad. For some data, square roots perform better than logs when you want to stretch values near zero (not in this case, though!).")
 ```
 
-### Color scales
+#### Color scales
 
 Besides location aesthetics, the most commonly used aesthetic is based on color (via `color` or `fill`).
 
@@ -1033,7 +1037,7 @@ There are many different palettes available in `ggplot2`, each of which depends 
 | [ColorBrewer](https://ggplot2.tidyverse.org/reference/scale_brewer.html) | `scale_*_brewer` | `scale_*_distiller` | [More info](https://colorbrewer2.org) |
 | [Gradient](https://ggplot2.tidyverse.org/reference/scale_gradient.html) | - | `scale_*_gradient` | [More info](https://scales.r-lib.org//reference/seq_gradient_pal.html) |
 
-#### Color scales: Define palettes
+##### Color scales: Define palettes
 
 While location scales by default map data directly to their respective axes with no changes (i.e. they perform an identity mapping), this is not so for color. This is because there is no inherent natural way to map a continuous or discrete variable to a color scale. Which scale do we use? There are infinitely many of them!
 
@@ -1041,7 +1045,7 @@ By default, for discrete scales `ggplot2` maps to the [HCL color scale](http://h
 
 Let's revisit our four rectangles to illustrate this. This time, though, we will allow the fill color for each rectangle to vary, and thus will include the fill as a variable in the `tiles` dataset.
 
-##### Exercise: Mapping color
+###### Exercise: Mapping color
 *Run the following code and then modify it by assigning the* `fill` *variable in the* `tiles` *data to the* `fill` *aesthetic.*
 
 ```{r mapping-color-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
@@ -1105,7 +1109,7 @@ It looks like "forestgreen" is mapped to "#F8766D" and "goldenrod1" is mapped to
 
 So how do we get the colors that are directly listed in the data? After all, our current `tiles` data is already directly representing aesthetic data. One way is to tell `ggplot2` that we want it to behave more like a location scale and use an identity mapping, which we can do by specifying the `scale_fill_identity()` function.
 
-##### Exercise: Identity color scale
+###### Exercise: Identity color scale
 *Starting with the plot below, add the* `scale_fill_identity()` *function at the end.*
 
 ```{r scale-fill-identity-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
@@ -1156,7 +1160,7 @@ tiles <- tribble(
 
 In this case, we can't use `scale_fill_identity()` since the levels of the `royalty` variable aren't color names. This is where the `scale_fill_manual()` comes into play, where you can specify how to map the levels of the discrete `royalty` variable to colors (i.e. _we_ get to specify the mapping of data to aesthetics).
 
-##### Exercise: Manual color mapping
+###### Exercise: Manual color mapping
 *Starting with the updated data below, add the* `scale_fill_manual()` *function and set the argument* `values` *equal to a named vector such that* `william` *gets mapped to* `forestgreen` *and* `mary` *gets mapped to* `goldenrod1`.
 
 *Here is the definition of the* `values` *argument from the ggplot2 reference.*
@@ -1224,7 +1228,7 @@ The following two definitions define the `name` and `labels` argument for color 
 
 > The `labels` argument is a character vector giving key labels (must be same length as `breaks`). The labels will be matched in order (usually alphabetical) with the breaks of the scale. If this is a named vector, then the labels will be matched based on the names instead.
 
-##### Exercise: Set legend titles and key labels
+###### Exercise: Set legend titles and key labels
 *Starting with the plot below, set the legend title to* `Royalty` *and the key labels* `King William` *for* `william` *and* `Queen Mary` *for* `mary`.
 
 ```{r color-legend-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
@@ -1306,7 +1310,7 @@ gradethis::grade_code()
 
 Just as with location scales, we can set limits with the `limits` argument. Since `royalty` is a discrete variable in this case, rather than specifying the limits using a lower and upper bound, we can just specify the limits as a subset of the levels of the `royalty` variable.
 
-##### Exercise: Adjust key limits
+###### Exercise: Adjust key limits
 *Starting with the plot below, set the* `limits` *argument so that only the "Queen Mary" rectangles show.*
 
 ```{r key-limits-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval = TRUE}
@@ -1352,7 +1356,7 @@ ggplot(data = tiles) +
 gradethis::grade_code()
 ```
 
-##### Exercise: Reorder keys
+###### Exercise: Reorder keys
 *Have you noticed how the keys are ordered? Looks like it's alphabetical. One nice use of* `limits` *is to reorder the legend keys. Starting with the plot below, set the* `limits` *argument so that "King William" comes before "Queen Mary" in the legend.*
 
 ```{r reorder-keys-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup", exercise.eval=TRUE}
@@ -1398,7 +1402,7 @@ ggplot(data = tiles) +
 gradethis::grade_code()
 ```
 
-#### Color scales: Transformations
+##### Color scales: Transformations
 
 All of the previous color scale examples covered _discrete scales_ and manual palettes. Let's explore some continuous color scales. This section will be expository only - no exercises! So just sit back and enjoy.
 
@@ -1535,6 +1539,732 @@ ggplot(stemdata) +
 ```
 
 Pretty cool! This makes it much easier to see variations between herbivory and how it might relate to plant size and growth.
+
+### Statistics
+
+So far we've created some _primitive geoms_ using `ggplot2`. With primitive geoms, there is no additional data processing that occurs between your data and what gets mapped to aesthetics in the plot (except any transformations from the scales). However, almost all plots and graphs of interest involve computing some statistical summaries of interest and then displaying those statistical summaries using multiple primitive geoms. Thus begins our foray into `ggplot2`'s use of **statistics**, or `stat`s in ggplot2 lingo.
+
+#### Bar plots
+
+Let's start by creating a bar plot. We create a bar plot when
+
+ - the explanatory variable is categorical, and
+ - we want to display a statistical summary which is numerical.
+
+Using multiple techniques, we are going to create the following bar plot showing the number of plants in each site.
+```{r, echo=FALSE, fig.align="center"}
+stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site))
+```
+
+The most common case for a bar plot is when we have one categorical variable and we want to count the number of occurrences of each category in the data. In order to do this, we create a contingency table consisting of the categories (or levels) of the variable and the counts of each level in the data.
+
+<<SHOW PICTURE OF DATA -> CONTINGENCY TABLE>>
+
+Once this is complete, we then create rectangles for each category with a minimum y-value at 0 and a maximum y-value at the number of occurrences for that category. We usually also make the bar widths such that they do not touch (to signify visually that the variable is categorical).
+
+##### Exercise: Create a contingency table using `dplyr`
+```{r contingency-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
+plotdata <- stemdata %>%
+  group_by(___) %>%
+  summarize(___)
+```
+
+```{r contingency-ex-1-solution}
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n())
+```
+
+```{r contingency-ex-1-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Create aesthetics
+
+```{r contingency-ex-2-setup, include=FALSE}
+library(tidyverse)
+stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n())
+```
+
+```{r contingency-ex-2, exercise=TRUE, exercise.setup="contingency-ex-2-setup"}
+plotdata <- plotdata %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-2-solution}
+plotdata <- plotdata %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-2-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Map to `geom_rect` geoms
+
+```{r contingency-ex-3-setup, include=FALSE}
+library(tidyverse)
+stemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv")
+plotdata <- stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count)
+```
+
+```{r contingency-ex-3, exercise=TRUE, exercise.setup="contingency-ex-3-setup", fig.align="center"}
+ggplot(data = plotdata) +
+  geom_rect(aes(___))
+```
+
+```{r contingency-ex-3-solution}
+ggplot(data = plotdata) +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax))
+```
+
+```{r contingency-ex-3-check}
+gradethis::grade_code()
+```
+
+##### Exercise: Add labels
+
+```{r add-labels-ex-1, exercise=TRUE, exercise.setup="contingency-ex-3-setup"}
+ggplot(data = plotdata) +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax))
+```
+
+```{r add-labels-ex-1-solution}
+ggplot(data = plotdata) +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax)) +
+  scale_x_continuous(breaks = 1:5,
+                     labels = c("BLD1", "BLD2", "PWR", "SKY", "YTB")) +
+  labs(x = "site", 
+       y = "count")
+```
+
+```{r add-labels-ex-1-check}
+gradethis::grade_code()
+```
+
+All in one pipeline:
+```{r, fig.align="center"}
+stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  mutate(xmin = 0.55 + 0:4,
+         xmax = 1.45 + 0:4,
+         ymin = 0,
+         ymax = count) %>%
+  ggplot() +
+  geom_rect(aes(
+    xmin = xmin,
+    xmax = xmax,
+    ymin = ymin,
+    ymax = ymax)
+  ) +
+  scale_x_continuous(breaks = 1:5,
+                     labels = c("BLD1", "BLD2", "PWR", "SKY", "YTB")) +
+  labs(x = "site", 
+       y = "count")
+```
+
+##### New Geom: `geom_bar`
+
+Let's look at our first complex geom - `geom_bar` - that automates a lot of this process. Here's the command in `ggplot2` using the `geom_bar` geom that performs the data processing and aesthetic mappings free of charge:
+
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site))
+```
+
+The `geom_bar` geom performs a lot of things in this example:
+
+ 1. Map the `site` variable to the `x` aesthetic via scales (`scale_x_discrete`). Note that this maps the levels of the categorical variable to integers on the `x` scale.
+ 2. Use the `count` statistic to compute the contingency table of the number of occurrences for each integer (corresponding to number of plants in each site).
+ 3. Map the computed `x` variable back to the `x` aesthetic and computed `count` variable to the `y` aesthetic (again using scales).
+ 4. The `geom_bar` geom computes default values for the `xmin`, `xmax`, `ymin`, and `ymax` based on parameters for the bars and the previously mapped `x` and `y` aesthetics. Defaults for the `fill` aesthetic are also computed.
+ 5. Plot the results using primitive `geom_rect` geoms and assign tick labels and axes labels automatically based on the original and calculated data from the statistic.
+
+```{r, echo=FALSE, out.width="95%", out.extra="class='center'", fig.cap="Figure 1. (1) Map the `site` variable to the `x` aesthetic, (2) count the occurrences of each integer (site) using the `count` statistic, (3) map the `x` and `y` aesthetics from the computed data, (4) compute aesthetics for the bars (xmin, xmax, ymin, ymax), and (5) map those aesthetics to the coordinate plane (in this case using `geom_rect` primitive)."}
+knitr::include_graphics("images/statistics.png")
+```
+
+As mentioned above, by default, `geom_bar` uses the `count` statistic. You can manually specify the statistic by specifying the `stat` argument as a string to the geom. Also note that, by default, `geom_bar` maps the computed `count` statistic to the `y` aesthetic. The following command is fully explicit but performs the same action as above.
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site,
+               y = after_stat(count)),
+           stat = "count")
+```
+
+Note the use of the `after_stat()` function, which alerts ggplot2 that you are mapping a _computed_ variable from the stat to the `y` aesthetic. Another important thing to note is that _the mapping of scales occurs prior to the statistic_. We'll see why this is important in future exercises. Finally, the `x = site` mapping that we specified is not the full story. The real variable that gets mapped to the `x` aesthetic is the _grouped site variable_, which is the computed `x` variable. To be pedantically complete, we can use a function in `ggplot2` called `stage` that allows us to map the exact path of variables to aesthetics.
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = stage(start = site, after_stat = x),
+               y = after_stat(count)),
+           stat = "count")
+```
+
+Luckily **ggplot2** hides a lot of the aesthetic defaults, but it is very helpful (in my opinion) to know exactly which commands are being used in case you want to modify or extend what is occurring. The next example illustrates this.
+
+##### Proportions
+
+Another common request for a bar plot is to plot the _proportion_ instead of the frequency. How to do this in `ggplot2`? The trick is in the `after_stat()` function in the call above and knowing that it can accept as an argument any expression involving the computed variables. Knowing this, we can recognize that a proportion is just going to be `count/sum(count)`, where `sum(count)` gives the total observations (or plants in this particular example). Here's the full command:
+
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site,
+               y = after_stat(count/sum(count))),
+           stat = "count")
+```
+
+##### Exercise: Proportions for a subset
+
+```{r prop-subset-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site,
+               y = after_stat(count/sum(count))),
+           stat = "count")
+```
+
+```{r prop-subset-ex-1-solution}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site,
+               y = after_stat(count/sum(count))),
+           stat = "count") +
+  scale_x_discrete(limits = c("BLD1", "BLD2"))
+```
+
+```{r prop-subset-ex-1-check}
+gradethis::grade_code("Make sure to note that the heights sum to 1!")
+```
+
+The previous exercise illustrates the importance of performing any scale operations **before** applying the statistic. Because of this order of operations, the proportions are calculated correctly!
+
+##### New Statistic: `identity`
+
+Another very important statistic is the "identity" statistic, which effectively skips the statistic step and goes straight to the aesthetic mapping step. One possible use of this is if we want a bar plot _but we already have the heights of the bars_. So, for example, we could create the bar plot above by first counting the plants in each site ourselves (i.e. doing the count statistic manually) and then pass that processed data to the `geom_bar` geom with the identity statistic.
+
+```{r}
+stemdata %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               y = count),
+           stat = "identity")
+```
+
+##### Exercise: Use identity
+
+```{r}
+stemdata %>%
+  filter(site %in% c("BLD1", "BLD2")) %>%
+  group_by(site) %>%
+  summarize(count = n()) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               y = count/sum(count)),
+           stat = "identity")
+```
+##### New Geom and Statistic: `geom_histogram`
+
+```{r}
+ggplot(data = stemdata) +
+  geom_histogram(aes(x = h_apical))
+```
+
+Default stat is bin.
+```{r}
+ggplot(data = stemdata) +
+  geom_histogram(aes(x = h_apical),
+                 stat = "bin")
+```
+
+Arguments for stat in geom.
+```{r}
+ggplot(data = stemdata) +
+  geom_histogram(aes(x = h_apical),
+                 bins = 20)
+```
+
+##### New Geom and Statistic: `geom_boxplot`
+
+```{r}
+ggplot(data = stemdata) +
+  geom_boxplot(aes(x = site, y = h_apical))
+```
+
+```{r}
+ggplot(data = stemdata) +
+  geom_boxplot(aes(x = site, y = herb_avg)) +
+  scale_y_continuous(trans = "log")
+```
+
+```{r}
+ggplot(data = stemdata) +
+  geom_boxplot(aes(x = site, y = herb_avg), outlier.color = "red") +
+  scale_y_continuous(trans = "log")
+```
+
+```{r}
+ggplot(data = stemdata) +
+  geom_crossbar(aes(x = site, 
+                    y = stage(start = h_apical, after_stat = middle),
+                    ymin = after_stat(lower),
+                    ymax = after_stat(upper)), 
+                stat = "boxplot",
+                fill = "white")
+```
+
+## Positions and Coordinates
+
+### Positions
+
+#### Position Stack: Stacked bar plots
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year))
+```
+
+#### Position Identity
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year),
+           alpha = 0.5,
+           color = "grey50",
+           position = "identity")
+```
+
+#### Position Dodge: Side-by-side barplots
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year),
+           color = "grey50",
+           position = "dodge")
+```
+
+#### Position Fill: Filled bar plots
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year),
+           position = "fill")
+```
+
+#### Position Jitter: Stripcharts
+
+```{r}
+ggplot(stemdata) +
+  geom_point(aes(x = site, y = h_apical))
+```
+
+```{r}
+ggplot(stemdata) +
+  geom_point(aes(x = site, y = h_apical),
+             position = "jitter")
+```
+
+```{r}
+ggplot(stemdata) +
+  geom_point(aes(x = site, y = h_apical),
+             alpha = 0.2,
+             position = position_jitter(width = 0.1))
+```
+
+```{r}
+ggplot(stemdata, aes(x = site, y = h_apical)) +
+  geom_boxplot() +
+  geom_point(alpha = 0.2,
+             position = position_jitter(width = 0.1))
+```
+
+```{r}
+ggplot(stemdata, aes(x = site, y = h_apical)) +
+  geom_boxplot(outlier.color = NA) +
+  geom_point(alpha = 0.2,
+             position = position_jitter(width = 0.1))
+```
+
+#### Position Nudge
+
+```{r}
+ggplot(stemdata, aes(x = site, y = h_apical)) +
+  geom_boxplot(outlier.color = NA, width = 0.2,
+               position = position_nudge(x = 0.3)) +
+  geom_point(alpha = 0.2,
+             position = position_jitter(width = 0.1))
+```
+
+### Coordinates
+
+```{r}
+ggplot(stemdata, aes(x = site, y = h_apical)) +
+  geom_boxplot(outlier.color = NA, width = 0.2,
+               position = position_nudge(x = 0.3)) +
+  geom_point(alpha = 0.2,
+             position = position_jitter(width = 0.1)) +
+  coord_cartesian(ylim = c(0, 100))
+```
+
+```{r}
+ggplot(stemdata, aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata, aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  coord_fixed(ylim = c(0, 200))
+```
+
+```{r}
+ggplot(stemdata, aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  coord_flip(ylim = c(0, 200))
+```
+
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site)) +
+  coord_flip()
+```
+```{r}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot(aes(x = h_apical,
+             y = herb_avg)) +
+  geom_point(alpha = 0.5,
+             shape = 21) +
+  geom_smooth(method = "lm", fill = NA) +
+  scale_y_continuous(trans = "log10")
+```
+
+```{r}
+stemdata %>%
+  filter(herb_avg > 0) %>%
+  ggplot(aes(x = h_apical,
+             y = herb_avg)) +
+  geom_point(alpha = 0.5,
+             shape = 21) +
+  geom_smooth(method = "lm", fill = NA) +
+  coord_trans(y = "log10")
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               fill = year),
+           color = "black") +
+  scale_x_discrete(limits = c("BLD1")) +
+  coord_polar(theta = "y", direction = -1) +
+  labs(x = NULL, y = NULL) +
+  theme_void()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = stage(start = site, after_stat = x + 2),
+               fill = year),
+           color = "black") +
+  scale_x_discrete(limits = c("BLD1")) +
+  coord_polar(theta = "y", direction = -1) +
+  labs(x = NULL, y = NULL) +
+  theme_void()
+```
+
+## Themes
+
+Themes control the "non-data elements" of your plot.  
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_classic()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_bw()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_dark()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_light()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_minimal()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_gray()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  theme_void()
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site, fill = year)) +
+  xkcd::theme_xkcd()
+```
+
+## Synthesis
+
+### Group aesthetic
+
+```{r}
+stemdata %>%
+  ggplot(aes(x = h_apical, y = h_apical.next, color = site)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  ggplot(aes(x = h_apical, y = h_apical.next, group = site)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  filter(site == "SKY", !is.na(h_apical), !is.na(h_apical.next)) %>%
+  sample_n(10) %>%
+  select(plantID, h_apical, h_apical.next) %>%
+  pivot_longer(cols = starts_with("h_apical"), names_to = "time", values_to = "height") %>%
+  ggplot(aes(x = time, y = height, group = plantID)) +
+  geom_line() +
+  geom_point(color = "red")
+```
+
+### Facets
+
+```{r}
+stemdata %>%
+  ggplot(aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ site) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next, color = year)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ site) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  filter(site %in% c("BLD1", "BLD2")) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next, color = year)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_wrap(vars(site), ncol = 1) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  filter(site %in% c("BLD1", "BLD2")) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_grid(site ~ year) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm") +
+  facet_grid(site ~ year) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+### Quantifying Uncertainty
+
+```{r}
+ggplot(data = stemdata) +
+  geom_bar(aes(x = site, y = h_apical),
+           stat = "summary",
+           fun = "mean")
+```
+
+```{r}
+ggplot(data = stemdata,
+       aes(x = site, y = h_apical)) +
+  geom_bar(stat = "summary",
+           fun = "mean") +
+  geom_point(stat = "summary",
+             fun = "mean")
+```
+
+```{r}
+ggplot(data = stemdata,
+       aes(x = site, y = h_apical)) +
+  geom_bar(stat = "summary",
+           fun = "mean") +
+  geom_errorbar(stat = "summary",
+                fun.data = mean_cl_normal,
+                fun.args = list(conf.int = 0.95),
+                width = 0.1)
+```
+
+```{r}
+ggplot(data = stemdata,
+       aes(x = site, y = h_apical)) +
+  geom_errorbar(stat = "summary",
+                fun.data = mean_cl_normal,
+                fun.args = list(conf.int = 0.95),
+                width = 0.1) +
+  geom_bar(stat = "summary",
+           fun = "mean")
+```
+
+```{r}
+ggplot(data = stemdata,
+       aes(x = site, y = h_apical)) +
+  geom_point(position = position_jitter(width = 0.1)) +
+  geom_errorbar(stat = "summary",
+                fun.data = mean_cl_normal,
+                fun.args = list(conf.int = 0.95),
+                width = 0.1,
+                position = position_nudge(x = 0.3)) +
+  geom_point(stat = "summary",
+             fun = "mean",
+             position = position_nudge(x = 0.3),
+             color = "red",
+             size = 0.5)
+```
+
+```{r}
+mean_data <- stemdata %>%
+  filter(!is.na(h_apical), !is.na(h_apical.next)) %>%
+  group_by(site, year) %>%
+  summarize(mu = mean(h_apical, na.rm = TRUE),
+            mu.next = mean(h_apical.next, na.rm = TRUE))
+    
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm",
+              se = FALSE) +
+  geom_hline(data = mean_data,
+             mapping = aes(yintercept = mu.next),
+             color = "red") +
+  geom_vline(data = mean_data,
+             mapping = aes(xintercept = mu),
+             color = "red") +
+  facet_grid(site ~ year) +
+  coord_cartesian(ylim = c(0, 200))
+```
+
+```{r}
+stemdata %>%
+  mutate(year = as.character(year)) %>%
+  filter(!is.na(h_apical), !is.na(h_apical.next)) %>%
+  ggplot(aes(x = h_apical, y = h_apical.next)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm",
+              se = FALSE) +
+  geom_segment(aes(x = 0, xend = 150, yend = after_stat(y)),
+               stat = "summary",
+               fun = "mean",
+               color = "red") +
+  geom_segment(aes(y = 0, yend = 200, xend = after_stat(x)),
+               stat = "summary",
+               fun = "mean",
+               color = "red",
+               orientation = "y") +
+  facet_grid(site ~ year) +
+  coord_cartesian(ylim = c(0, 200))
+```
 
 ### Congratulations! You have finished "Data Visualization with ggplot2 (Part 1)"!
 
