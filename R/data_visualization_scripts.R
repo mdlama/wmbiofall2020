@@ -30,6 +30,8 @@ mybar <- stemdata %>%
 
 stemdata %>% select(year:h_apical, -X1, -X) %>% head() %>% grid.table(row = NULL)
 
+stemdata %>% group_by(site) %>% summarize(count = n()) %>% grid.table(row = NULL)
+
 stemdata %>%
   mutate(site = fct_recode(site, "1" = "BLD1", "2" = "BLD2", "3" = "PWR", "4" = "SKY", "5" = "YTB")) %>%
   select(x = site) %>%
@@ -46,6 +48,51 @@ layer_data(mybar) %>%
 layer_data(mybar) %>%
   select(x, y, xmin, xmax, ymin, ymax, fill) %>%
   grid.table(rows=NULL)
+
+# Stacked bar plot
+mystack <- stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               fill = year))
+
+mystack_id <- stemdata %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               fill = as.factor(year)),
+           position = "identity")
+
+mystack_themed <- stemdata %>%
+  mutate(year = as.character(year)) %>%
+  ggplot() +
+  geom_bar(aes(x = site,
+               fill = year)) +
+  theme_classic()
+
+scales::hue_pal()(5)
+stemdata %>%
+  mutate(site = fct_recode(site, "1" = "BLD1", "2" = "BLD2", "3" = "PWR", "4" = "SKY", "5" = "YTB"),
+         year = fct_recode(as.character(year), "#F8766D" = "2013", "#A3A500" = "2014", "#00BF7D" = "2015", "#00B0F6" = "2016", "#E76BF3" = "2017")) %>%
+  select(x = site, fill = year) %>%
+  head() %>% grid.table(row = NULL)
+
+layer_data(mystack) %>%
+  select(x, fill, count) %>%
+  head() %>% grid.table(rows = NULL)
+
+layer_data(mystack) %>%
+  select(x, y = count, fill = fill) %>%
+  head() %>% grid.table(rows = NULL)
+
+layer_data(mystack_id) %>%
+  select(x, y, xmin, xmax, ymin, ymax, fill) %>%
+  head() %>% grid.table(rows=NULL)
+
+layer_data(mystack) %>%
+  select(x, y, xmin, xmax, ymin, ymax, fill) %>%
+  head() %>% grid.table(rows=NULL)
+
+# ---------
 
 tmp <- stemdata %>%
   ggplot() +
@@ -238,3 +285,11 @@ stemdata %>%
              mapping = aes(xintercept = mu),
              color = "red") +
   coord_cartesian(ylim = c(0, 200))
+
+longerstemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/File:/uploads/stemdata.csv") %>%
+  mutate(year = as.character(year)) %>%
+  filter(site == "SKY", !is.na(h_apical), !is.na(h_apical.next)) %>%
+  select(plantID, h_apical, h_apical.next) %>%
+  mutate(slope = h_apical.next - h_apical) %>%
+  tidyr::pivot_longer(cols = starts_with("h_apical"), names_to = "month", values_to = "height") %>%
+  mutate(month = forcats::fct_recode(month, June = "h_apical", September = "h_apical.next"))
