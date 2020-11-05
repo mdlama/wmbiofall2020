@@ -1,5 +1,5 @@
 ---
-title: "Data Visualization with ggplot2 (Part 1)"
+title: "Data Visualization with ggplot2"
 author: "M. Drew LaMar"
 output:
   learnr::tutorial:
@@ -1559,7 +1559,7 @@ stemdata %>%
   geom_bar(aes(x = site))
 ```
 
-The most common case for a bar plot is when we have one categorical variable and we want to count the number of occurrences of each category in the data. In order to do this, we create a contingency table consisting of the categories (or levels) of the variable and the counts of each level in the data.
+The most common case for a bar plot is when we have one categorical variable and we want to count the number of occurrences of each category in the data. In order to do this, we create a contingency table consisting of the categories (or levels) of the variable and the counts of each level in the data. The following image illustrates this with the `site` variable.
 
 ```{r, echo=FALSE, out.width="400px",  out.extra="class='center'"}
 knitr::include_graphics("images/contingency-table.png")
@@ -1677,7 +1677,7 @@ ggplot(data = plotdata) +
 ```
 
 ```{r add-labels-ex-1-check}
-gradethis::grade_code("Why doesn't `scale_x_discrete()` work? It is because the data type of the x aesthetics are double.")
+gradethis::grade_code("Why doesn't `scale_x_discrete()` work? It is because the data type of the x aesthetic is double.")
 ```
 
 Here is the data manipulation and plotting all in one pipeline:
@@ -1733,7 +1733,7 @@ ggplot(data = stemdata) +
            stat = "count")
 ```
 
-Note the use of the `after_stat()` function, which alerts ggplot2 that you are mapping a _computed_ variable from the stat to the `y` aesthetic (see Step 3 in Figure 1). Another important thing to note is that _the mapping of the x scale occurs prior to the statistic_. We'll see why this is important in future exercises. Finally, the `x = site` mapping that we specified is not the full story. The real variable that gets mapped to the `x` aesthetic in the end is the _grouped site variable_, which is the computed `x` variable (again, see Step 3 in Figure 1). To be pedantically complete, we can use a function in `ggplot2` called `stage` that allows us to map the exact path of variables to aesthetics during multiple _stages_ (illustrated in Figure 1 with the colored arrows in Steps 1 and 3 - see inset table "Aesthetic mapping stages").
+Note the use of the `after_stat()` function, which alerts ggplot2 that you are mapping a _computed_ variable from the stat to the `y` aesthetic (see Step 3 in Figure 1). Another important thing to note is that _the mapping of the x scale occurs prior to the statistic_. We'll see why this is important in future exercises. Finally, the `x = site` mapping that we specified is not the full story. The real variable that gets mapped to the `x` aesthetic in the end is the _grouped site variable_, which is the computed `x` variable (see Figure 1; Step 2 computes the grouped x variable and Step 3 maps the computed x variable back to the x aesthetic). To be pedantically complete, we can use a function in `ggplot2` called `stage` that allows us to map the exact path of variables to aesthetics during multiple _stages_ (illustrated in Figure 1 with the colored arrows in Steps 1 and 3 - see inset table "Aesthetic mapping stages").
 ```{r}
 ggplot(data = stemdata) +
   geom_bar(aes(x = stage(start = site, after_stat = x),
@@ -1741,7 +1741,7 @@ ggplot(data = stemdata) +
            stat = "count")
 ```
 
-Thus, `ggplot2` first assigns the `site` variable to the `x` aesthetic, the `count` statistic performs a dplyr `group_by` and `summarize` operation akin to what we performed previously (but this time on the aesthetic variable `x`), and finally the computed `x` variable gets mapped to the aesthetic `x` and computed `count` variable gets mapped to the `y` aesthetic, both after the statistic operation.  Luckily **ggplot2** hides a lot of these aesthetic default mappings, but it is very helpful to know exactly which commands are being used in case you want to modify or extend what is occurring. The next example illustrates this.
+Thus, `ggplot2` first assigns the `site` variable to the `x` aesthetic, the `count` statistic performs a dplyr `group_by` and `summarize` operation akin to what we performed previously (but this time on the aesthetic variable `x`), and finally the computed `x` variable gets mapped to the `x` aesthetic and computed `count` variable gets mapped to the `y` aesthetic, both after the statistic operation.  Luckily **ggplot2** hides a lot of these aesthetic default mappings, but it is very helpful to know exactly which commands are being used in case you want to modify or extend what is occurring. The next example illustrates this.
 
 ##### Proportions
 
@@ -1756,7 +1756,7 @@ ggplot(data = stemdata) +
 
 ##### Exercise: Proportions for a subset
 *This exercise illustrates the importance of ggplot2 performing the scale operation _before_ the statistic is computed. Suppose we want a relative frequency distribution for a subset of sites, say the two Blandy sites "BLD1" and "BLD2". To accomplish this, use the* `scale_x_discrete` *function to limit the sites to just "BLD1" and "BLD2"*.
-```{r prop-subset-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r prop-subset-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
   geom_bar(aes(x = site,
                y = after_stat(count/sum(count))),
@@ -1847,7 +1847,7 @@ ggplot(data = stemdata) +
                  stat = "bin")
 ```
 
-For histograms, the data is usually **continuous**, and so the bars are drawn touching (as opposed to bar plots where the variable was discrete and thus the bars DO NOT touch). The touching bars helps signify that the variable can be anywhere in the range of the data. Note as well that by default the `geom_histogram` geom sets the `color` aesthetic (or boundary color) to NA. This again helps signify continuity of the specified variable. 
+For histograms, the data is usually **continuous**, and so the bars are drawn touching (as opposed to bar plots where the variable was discrete and thus the bars DO NOT touch). The touching bars help signify that the variable can be anywhere in the range of the data. Note as well that by default the `geom_histogram` geom sets the `color` aesthetic (or boundary color) to NA. This again helps signify continuity of the specified variable. 
 
 ###### Exercise: For a healthy life, you have to set boundaries
 *Suppose for aesthetic reasons you really want boundaries on your histogram rectangles. Set the* `color` *aesthetic to "black"*.
@@ -1913,7 +1913,7 @@ ggplot(data = stemdata) +
 As you can see, there are many primitive geoms that ggplot2 uses to create a boxplot: `geom_rect`, `geom_segment`, and `geom_point`. Actually, there exists another geom designed specifically to capture an interval (or the box in the boxplot): `geom_crossbar`.
 
 ###### Exercise: Multiple boxplots
-*Modify the boxplot code to show a boxplot of apical height for each site. While you're at it, map site to the fill box color as well..*
+*Modify the boxplot code to show a boxplot of apical height for each site. While you're at it, map site to fill as well.*
 
 ```{r boxplot-site-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
@@ -1932,7 +1932,7 @@ gradethis::grade_code()
 ```
 
 ###### Exercise: Boxplot of herbivory average
-*Modify the boxplot code below to plot herbivory average versus site.*
+*Modify the boxplot code below to plot herbivory average* (`herb_avg`) *versus site.*
 
 ```{r boxplot-herb-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
@@ -1999,14 +1999,14 @@ ggplot(data = stemdata) +
 ```
 
 ```{r boxplot-log-ex-1-check}
-gradethis::grade_code("Remember: the log scale is performed first, and then the boxplot statistics are performed. So the median that you see in the resulting plot is the median of log herbivory.")
+gradethis::grade_code("Remember: the log scale is performed first, and then the boxplot statistics are performed. So the quartiles that you see in the resulting plot are the quartiles of log herbivory.")
 ```
 
 There we go! Got rid of a lot of the outliers!
 
 Let's finish off the statistics section with a challenge. The challenge will be to recreate just the box portion of the boxplot by using the `geom_crossbar` geom. This is going to test your understanding of the different aesthetic mapping stages (see Steps 1 and 3 in Figure 1) and how to use the boxplot statistic (rather than the boxplot geom).
 
-First, it is helpful to note that the `geom_crossbar` uses the aesthetics `ymin`, `y`, and `ymax` to specify the crossbar. To complete the challenge, review the computed variables from the boxplot statistic and think about when and how to map data and compute data to the aesthetics. By _when_, we mean either during the _start_ stage or _after_stat_ stage; and by _how_ we mean which data/computed data gets mapped to which aesthetics at each stage. Use the hints to help walk you through it!
+First, it is helpful to note that `geom_crossbar` uses the aesthetics `ymin`, `y`, and `ymax` to specify the crossbar. To complete the challenge, review the computed variables from the boxplot statistic and think about when and how to map original data and compute data to the aesthetics. By _when_, we mean either during the _start_ stage or _after_stat_ stage; by _how_ we mean which original/computed data gets mapped to which aesthetics at each stage. Use the hints to help walk you through it!
 
 ###### Challenge: Recreate part of boxplot using statistic
 *Use the* `geom_crossbar` *geom with the* `boxplot` *statistic to recreate the box of the boxplot for the* `h_apical` *variable. Keep the* `x` *aesthetic the same, i.e. we will plot boxplot boxes for the* `h_apical` *variable for each of the sites.*
@@ -2039,7 +2039,7 @@ ggplot(data = stemdata) +
 ```
 
 ```{r boxplot-crossbar-ex-1-hint-3}
-# Yes! We use the after_stat function to signify that we
+# We use the after_stat function to signify that we
 #   want to assign the computed variables lower and upper
 #   from the boxplot statistic to ymin and ymax, respectively.
 # 
@@ -2118,7 +2118,7 @@ ggplot(data = stemdata) +
 gradethis::grade_code()
 ```
 
-That's interesting. So it looks like it, based on the "count" statistic, counted the number of plants in each site _in each year_, and then stacked the resulting bars on top of each other. In this example, there is a default position argument that ggplot2 is using called "stack". Here's the explicit code showing this:
+That's interesting. So it looks like ggplot2, based on the "count" statistic, counted the number of plants in each site _in each year_, and then stacked the resulting bars on top of each other. In this example, there is a default position argument that ggplot2 is using called "stack". Here's the explicit code showing this:
 
 ```{r}
 ggplot(data = stemdata) +
@@ -2168,7 +2168,7 @@ Just as there is an identity statistic, there is also an identity position, whic
 #### Exercise: Position Identity
 *Modify the stacked bar plot code by setting the position argument to* `"identity"`. *Also set* `alpha` *to 0.5 and* `color` *to* `"grey50"`.
 
-```{r stacked-barplot-ex-3, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r stacked-barplot-ex-3, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
   geom_bar(aes(x = site, 
                fill = year))
@@ -2187,7 +2187,7 @@ ggplot(data = stemdata) +
 gradethis::grade_code("The alpha aesthetic let's us more easily see all of the overlapping bars. It makes sense that they are all overlapping since site is mapped to x, so all the years in each site will be at the same x location on the plot.")
 ```
 
-The following figure extends Figure 1 to include all of the steps in ggplot2's process, including the newly introduced position step.
+The following figure extends Figure 1 to include all of the steps in ggplot2's process, including the newly introduced position step. It implements the modified bar plot where we mapped `year` to `fill` and uses the default "stack" position adjustment.
 
 ```{r, echo=FALSE, out.width="95%", out.extra="class='center'", fig.cap="Figure 2. (1) Map the `site` variable to the `x` aesthetic and `year` variable to the `fill` aesthetic, (2) count the occurrences of each integer **and** hexadecimal color (site and year, respectively) using the `count` statistic, (3) map the `x`, `y` and `fill` aesthetics from the computed data, (4) compute aesthetics for the bars (xmin, xmax, ymin, ymax), (5) make position adjustments (stacking the bars in this case), (6) map those aesthetics to the coordinate plane (in this case using `geom_rect` primitives), and finally (7) adjust the look-and-feel of the non-data objects in the plot (like font, axes, grid lines, etc)."}
 knitr::include_graphics("images/ggplot2-process.png")
@@ -2200,7 +2200,7 @@ Let's continue learning about more position types with a few more examples.
 #### Exercise: Side-by-side barplots with position dodge
 *Override the default stack position by specifying the position as* `"dodge"`.
 
-```{r dodged-barplots-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r dodged-barplots-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
   geom_bar(aes(x = site, 
                fill = year))
@@ -2220,7 +2220,7 @@ gradethis::grade_code("This creates a side-by-side barplot! The overlapping bars
 #### Exercise: Filled bar plots with position fill
 *This time override the default stack position by specifying the position as* `"fill"`.
 
-```{r fill-barplots-ex-1, exercise=TRUE, exercise.setup="tidyverse-setup"}
+```{r fill-barplots-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
 ggplot(data = stemdata) +
   geom_bar(aes(x = site, 
                fill = year))
@@ -2366,7 +2366,7 @@ Layering a stripchart on top of a boxplot is a great way to both show the data a
 position = position_nudge(x = 0.3)
 ```
 
-#### Exercise: Get out of the way! Introducing position nudge
+#### Exercise: Socially distance your geoms
 *Starting with the layered geoms in the previous plot, use position nudge on the boxplot to move them horizontally 0.3 units to the right. Also, use the* `width` *argument of the boxplot geom to set the boxes width to* 0.2.
 
 ```{r stripchart-ex-6, exercise=TRUE, exercise.setup="stemdata-setup"}
@@ -2482,7 +2482,7 @@ The coordinate mapping step is responsible for taking the aesthetics and actuall
 | `coord_trans()`     | Apply data transformation to x and y aesthetics AFTER data processed by the statistic |
 | `coord_polar()`     | Polar coordinates with x and y mapped to radius and angle |
 
-We learned in the section on scales that setting the limits in a scale will, by default, clip the data outside the requested range. This is so we can limit or subset our data for statistical calculations. While there is a way to not clip when specifying a scale, it is best to use the coordinate system to perform zooming operations (either in or out).
+We learned in the section on scales that setting the limits in a scale will, by default, clip the data outside the requested range. This is so we can limit or subset our data for statistical calculations. While there is a way to not clip when specifying a scale, it is best to use the coordinate system to perform zooming operations (either zoom-in or zoom-out).
 
 #### Exercise: Zooming in with coord_cartesian
 *The cartesian coordinate system (* `coord_cartesian()` *) is the default coordinate system. We can specify the x and/or y limits for the plot by setting the* `xlim` *or* `ylim` *arguments to* `coord_cartesian()`, *respectively. Starting with the previous plot, add the* `coord_cartesian()` *function and set the* `ylim` *argument to* `c(0, 75)`.
@@ -2533,6 +2533,7 @@ ggplot(stemdata,
                                         height = 0)) +
   scale_y_continuous(limits = c(0, 75))
 ```
+
 Again, by limiting the axes via scales, we are subsetting the data _before we compute statistics_, which means boxplots are computed on the subsetted data with apical height between 0 and 75 cm.
 
 #### Exercise: Zoom using coord_cartesian() to hide outliers
@@ -2579,7 +2580,7 @@ gradethis::grade_code()
 #### Exercise: Flip the axes
 *Horizontal bar plots are a common visualization. Add the* `coord_flip()` *coordinate system to the bar plot below.*
 
-```{r coord-flip-ex-1, exercise=TRUE, exercise.setup="stemdata-setup"}
+```{r coord-flip-ex-1, exercise=TRUE, exercise.setup="stemdata-setup", exercise.eval=TRUE}
 ggplot(data = stemdata) +
   geom_bar(aes(x = site))
 ```
@@ -2645,16 +2646,17 @@ stemdata %>%
 ```
 
 ```{r log-transform-coord-ex-1-check}
-gradethis::grade_code("Note how the resulting line is log-transformed to a curve!")
+gradethis::grade_code()
 ```
+
+Note how the resulting line is log-transformed to a curve!
 
 #### Polar coordinates, or "how to make a pie chart"
 
 Okay, so while pie charts are the red-headed stepchild of data visualization, they do have their place, so let's make one! Because of the constructive nature of ggplot2 visualization, we can actually create a pie chart by combining a bar plot with a polar coordinate transformation (which is pretty cool, I must say). Take a look at the following code and see if you can make sense of it before we discuss the details.
 
 ```{r}
-stemdata %>%
-  ggplot() +
+ggplot(data = stemdata) +
   geom_bar(aes(x = site,
                fill = year),
            color = "black") +
@@ -2672,10 +2674,10 @@ stemdata %>%
   geom_bar(aes(x = site,
                fill = year),
            color = "black") +
-  scale_x_discrete(limits = c(0, "BLD1", 2))
+  scale_x_discrete(limits = c(0, "BLD1", 2)) # Adding 0 and 2 as ticks to make it clear where the box plot is located
 ```
 
-Polar coordinates consist of specifying spatial coordinates using a radius `r` and an angle `theta`, rather than the cartesian `x` and `y`. When using polar coordinates in ggplot2, what we do is _map the angle `theta` and radius `r` to the positional cartesian coordinates `x` and `y`_. In our example, we specified `theta` as `y`, which implies `r` is `x`. What this means is every horizontal line in the bar plot above gets mapped to a particular ray (line) at a specific angle given by the y coordinate. The ray actually starts from zero, i.e. the minimum of the x coordinate (in this case 0.5) gets mapped to the origin. If we draw continuously all of the rays starting from the origin at different angles given by the y coordinate, we get a pie chart!
+Polar coordinates consist of specifying spatial coordinates using a radius `r` and an angle `theta`, rather than the cartesian `x` and `y`. When using polar coordinates in ggplot2, what we do is _map the angle `theta` and radius `r` to the positional cartesian coordinates `x` and `y`_. In our example, we specified `theta` as `y`, which implies `r` is `x`. What this means is every horizontal line in the bar plot above gets mapped to a particular ray (line) at a specific angle given by the y coordinate, where the y coordinate is mapped to the interval $[0, 2\pi)$. The ray actually starts from zero, i.e. the minimum of the x coordinate (in this case 0.5) gets mapped to the origin. If we draw continuously all of the rays starting from the origin at different angles given by the y coordinate, we get a pie chart!
 
 #### Challenge: Donut plot
 *Modify the pie chart below to make the following donut plot.*
@@ -2799,8 +2801,7 @@ The remainder of this tutorial covers some bits-and-pieces that didn't quite fit
  - **The `group` aesthetic**: Replicates a geom over a grouping variable (_general discrete aesthetic_)
  - **Facets**: Maps a categorical variable to different coordinate systems via subsetting over levels of the variable
  - **Quantifying Uncertainty**: Introduces geoms and stats useful for quantifying uncertainty, like confidence intervals
- - **Access layer data**: Get a peak at the wizard behind the curtain
- 
+
 ### Group aesthetic
 
 The `group` aesthetic is a general discrete aesthetic that allows you to replicate a geom over levels of a categorical variable _without_ having to associate the variable with an existing aesthetic, like `color` or `fill`.
@@ -2845,7 +2846,7 @@ One of the sites has a much larger confidence band!  It is likely that this is t
 
 #### Paired data
 
-In the `stemdata` dataset, each plant gets its height measured at two separate times (June and September). This is an example of a _repeated measure_. What we are about to create next is a paired stripchart where "month" is the explanatory categorical variable with levels June and September, and "height" is the response variable. The problem is that the explanatory variable's levels are spread out over columns: in other words, not tidy! What we need to do is grab these two column values and create the new "month" variable, combining the `h_apical` and `h_apical.next` variables into one response variable called `height`. Let's introduce a function from the `tidyr` package that lets us make our data "longer" and "tidyer" to do exactly this: `pivot_longer()`. Take a look at the following code:
+In the `stemdata` dataset, each plant gets its height measured at two separate times (June and September). This is an example of a _repeated measure_. What we are about to create next is a paired stripchart where "month" is the explanatory categorical variable with levels June and September, and "height" is the response variable. The problem is that the explanatory variable's levels are spread out over columns: in other words, not tidy! What we need to do is grab these two column values and create the new "month" variable, combining the `h_apical` and `h_apical.next` variables into one response variable called `height`. Let's introduce a function from the `tidyr` package that lets us make our data "longer" and "tidyer" to do exactly this: `pivot_longer()`. To make things a little simpler, we're going to filter the data to only show plants in Sky Meadows, and remove and NAs in height for June and September. Take a look at the following code:
 
 ```{r}
 longerstemdata <- stemdata %>%
@@ -2872,7 +2873,7 @@ longerstemdata <- read_csv("https://qubeshub.org/community/groups/introbiostats/
 Let's now create our paired stripchart.
 
 #### Exercise: Paired stripchart
-*Complete the code below to create a paired stripchart with* `month` *as the explantory variable,* `height` *as the response variable, and* `group` *chosen so that connecting lines are drawn between the two measurements for every sampled plant. Note that we've taken the extra data-processing step of (1) recoding the* `month` *factor so that "h_apical" is not "June" and "h_apical.next" is not "September", and (2) grabbed a random sample of 10 plants so the plot is not too messy.*
+*Complete the code below to create a paired stripchart with* `month` *as the explantory variable,* `height` *as the response variable, and* `group` *chosen so that connecting lines are drawn between the two measurements for every sampled plant. Note that we've taken the extra data-processing step of (1) recoding the* `month` *factor so that "h_apical" is now "June" and "h_apical.next" is now "September", and (2) grabbed a random sample of 10 plants so the plot is not too messy.*
 
 ```{r paired-stripchart-ex-1, exercise=TRUE, exercise.setup="longerstemdata-setup"}
 longerstemdata %>%
@@ -2915,7 +2916,7 @@ ggplot(data = stemdata,
   scale_y_continuous(limits = c(0, 200))
 ```
 
-There is quite a bit of overlapping geoms and points here, so instead of assigning `site` to the `group` variable, let's assign `site` to facets:
+There is quite a bit of overlapping geoms and points here, so instead of assigning `site` to the `group` variable, let's assign `site` to facets using `facet_wrap`:
 
 ```{r}
 ggplot(data = stemdata,
@@ -2927,7 +2928,7 @@ ggplot(data = stemdata,
   scale_y_continuous(limits = c(0, 200))
 ```
 
-To specify which variable we are facetting by, we use the `vars()` function, where the argument to the function is one of the **var**iables. The `facet_wrap` argument above can be thought of as assigning site to columns (the default), which has the effect of putting panels down for each level of site along columns first, then wrapping to the next row once it reaches the end of the plotting space.
+To specify which variable we are facetting by, we use the `vars()` function, where the argument to the function is one of the original data **var**iables. The `facet_wrap` argument above can be thought of as assigning site to columns (the default), which has the effect of putting panels down for each level of site along columns first, then wrapping to the next row once it reaches the end of the plotting space.
 
 #### Exercise: Assign year to color
 *Now that we've "made some room" via facetting over site, we have some visual room to assign variables to more aesthetics. Starting with the previous plot, now assign year to color.*
@@ -3052,7 +3053,7 @@ stemdata %>%
 gradethis::grade_code()
 ```
 
-If you look at the y axes limits in the resulting facets, you'll notice that they are the same. By default, ggplot2 syncs the scales for all of the panels. This can be useful to make it clear that there are fewer plants in BLD2 than in BLD1, but what if all you care about is comparing the shape? There is a `scales` argument to the facet functions that allow you to "free up" one or both positional scales. The accepted values are "fixed" (or synced, the default), "free" (both scales free to vary), "free_x" or "free_y" (only one scale free to vary).
+If you look at the y axes limits in the resulting facets, you'll notice that they are the same. By default, ggplot2 syncs the scales for all of the panels. This can be useful to make it clear that there are fewer plants in BLD2 than in BLD1, but what if all you care about is comparing the shape? There is a `scales` argument to the facet functions that allows you to "free up" one or both positional scales. The accepted values are "fixed" (or synced, the default), "free" (both scales free to vary), "free_x" or "free_y" (only one scale free to vary).
 
 #### Exercise: Freedom!
 *Free the y axis in the previous stacked histogram.*
@@ -3083,9 +3084,9 @@ There is quite a lot more to learn about facetting. Please see [the facetting se
 
 In the final section of this tutorial, we will explore some geoms and stats that allow us to easily add averages and confidence intervals to plots.
 
-The real gem here is the `summary` statistic that will compute summary statistics for your data. You can think of the `summary` statistic as a generalization of the `count` and `bin` statistics, as it can compute any specified aggregate statistic.
+The real gem here is the `summary` statistic that will compute summary statistics for your data. You can think of the `summary` statistic as a generalization of the `count` and `bin` statistics, as it can compute other aggregate statistics.
 
-The easiest use of the `summary` statistic is to specify the aggregate function as a string with the `fun` argument. The `fun` argument should accept a vector of values and return a number (i.e. an aggregate). The "summary" statistic requires both an `x` and `y` aesthetic and will compute the statistic given by `fun` on the `y` values subsetted on the levels of the `x` variable. Let's compute a bar plot where the heights of the bars represent the average apical height in June for each site.
+The easiest use of the `summary` statistic is to specify the aggregate function as a string with the `fun` argument. The function specified by the `fun` argument should accept a vector of values and return a number (i.e. an aggregate). The "summary" statistic requires both an `x` and `y` aesthetic and will compute the statistic given by `fun` on the `y` values subsetted on the levels of the `x` variable. Let's compute a bar plot where the heights of the bars represent the average apical height in June for each site (using the `mean` function).
 
 ```{r}
 ggplot(data = stemdata) +
@@ -3146,7 +3147,7 @@ ggplot(data = stemdata,
                 width = 0.1)
 ```
 
-If you change the order of the geoms, you will get a common plot called a "dynamite plot."
+Note the `width` argument to `geom_errorbar` which controls their width. If you change the order of the geoms, you will get a common plot called a "dynamite plot."
 
 #### Exercise: Create a dynamite plot
 *Change the order of the geoms to create a dynamite plot.*
@@ -3264,9 +3265,20 @@ gradethis::grade_code()
 
 ### Final words
 
-Nice work! You've completed your initial foray into ggplot2 and learned about the grammar of graphics. No one remembers all of the commands (there are a lot!), but hopefully the intuitive nature of the grammar allows you to think about how to construct all kinds of plots that we haven't covered. Use Figure 2 as a reference and reminder of the steps! Also make sure to use the resources mentioned in the header of this tutorial!
+Nice work! You've completed your initial foray into ggplot2 and learned about the grammar of graphics. No one remembers all of the commands (there are a lot!), but hopefully the intuitive nature of the grammar allows you to think about how to construct all kinds of plots that we haven't covered. Use Figure 2 (shown again below) as a reference and reminder of the steps! Also make sure to use the resources mentioned below and in the header of this tutorial!
 
-### Congratulations! You have finished "Data Visualization with ggplot2 (Part 2)"!
+```{r, echo=FALSE, out.width="95%", out.extra="class='center'", fig.cap="Figure 2. (1) Map the `site` variable to the `x` aesthetic and `year` variable to the `fill` aesthetic, (2) count the occurrences of each integer **and** hexadecimal color (site and year, respectively) using the `count` statistic, (3) map the `x`, `y` and `fill` aesthetics from the computed data, (4) compute aesthetics for the bars (xmin, xmax, ymin, ymax), (5) make position adjustments (stacking the bars in this case), (6) map those aesthetics to the coordinate plane (in this case using `geom_rect` primitives), and finally (7) adjust the look-and-feel of the non-data objects in the plot (like font, axes, grid lines, etc)."}
+knitr::include_graphics("images/ggplot2-process.png")
+```
+
+Helpful resources for this tutorial:
+
+ - [ggplot2 Reference](https://ggplot2.tidyverse.org/index.html)
+ - [ggplot2 Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf)
+ - [R for Data Science: Data visualisation](https://r4ds.had.co.nz/data-visualisation.html) (Free online book chapter)
+ - [ggplot2: Elegant Graphics for Data Analysis](https://ggplot2-book.org/) (Free online book)
+
+### Congratulations! You have finished "Data Visualization with ggplot2"!
 
 Please enter your name and then copy-and-paste the text in the box to the assignment on Blackboard.
 
@@ -3277,7 +3289,7 @@ verbatimTextOutput("turnin")
 
 ```{r server, context="server"}
 output$turnin <- renderText({
-  stamp <- paste("Finished Data Visualization with ggplot2 - Part 2:", Sys.time(), input$name)
+  stamp <- paste("Finished Data Visualization with ggplot2:", Sys.time(), input$name)
   paste0(stamp, "\n",
          digest::digest(stamp, "md5", serialize=FALSE))
 })
