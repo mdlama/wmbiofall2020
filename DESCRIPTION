@@ -11,7 +11,9 @@ Imports:
     shiny,
     learnr,
     digest,
-    gradethis
+    gradethis,
+    tidyverse,
+    xkcd
 Remotes:
     rstudio/learnr@1f34b45,
     rstudio-education/gradethis@b137cea
